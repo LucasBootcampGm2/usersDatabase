@@ -1,10 +1,7 @@
 import sqlite3 from "sqlite3";
+import { handleError } from "../middlewares/middlewares.js";
 
-const db = new sqlite3.Database("../users.db3", (err) => {
-  err
-    ? console.error("Error opening database:", err.message)
-    : console.log("Database opened successfully.");
-});
+const db = new sqlite3.Database("../users.db3", handleError);
 
 db.serialize(() => {
   db.run(
@@ -17,14 +14,12 @@ db.serialize(() => {
       role TEXT NOT NULL
     )
     `,
-    (err) => {
-      if (err) console.error("Error creating table:", err.message);
-    }
+    handleError
   );
 
   db.run("SELECT COUNT(*) as count FROM users", (err, row) => {
     if (err) return console.error(`Error checking users count: ${err.message}`);
-    
+
     if (row.count === 0) {
       const inserStmt = db.prepare(
         `INSERT INTO users (name,email,password,role) VALUES (?,?,?,?)`
