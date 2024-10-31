@@ -17,4 +17,14 @@ router.get("/", authenticate, authorize("admin"), (req, res) => {
   });
 });
 
+router.get("/:id", authenticate, (req, res, next) => {
+    const id = parseInt(req.params.id);
+    db.get("SELECT * FROM users WHERE id = ?", [id], (err, row) => {
+      if (err) return next(err);
+      row
+        ? res.status(200).json(row)
+        : res.status(404).json({ message: "User not found" });
+    });
+  });
+
 export default router;
