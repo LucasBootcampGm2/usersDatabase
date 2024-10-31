@@ -1,20 +1,14 @@
 import express from "express";
-import {
-  logger,
-  handleError,
-} from "../../middlewares/middlewares.js";
-import userRouter from "../../routes/users.js";
 
 const app = express();
-const port = 3000;
 
 app.use(express.json());
-app.use(logger);
 
-app.use("/users", userRouter);
+const port = 3000;
 
-app.use(handleError);
-
-app.listen(port, () => {
-  console.log(`Server started at http://localhost:${port}`);
+app.listen(port, (err) => {
+  if (err) {
+    console.error(err);
+  }
+  console.log(`Server listening at http://localhost:${port}`);
 });
