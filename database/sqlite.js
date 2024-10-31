@@ -1,6 +1,6 @@
 import sqlite3 from "sqlite3";
 
-const db = new sqlite3.Database("./users.db3", (err) => {
+const db = new sqlite3.Database("../users.db3", (err) => {
   err
     ? console.error("Error opening database:", err.message)
     : console.log("Database opened successfully.");

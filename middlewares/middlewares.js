@@ -1,3 +1,4 @@
+import db from "../database/sqlite.js";
 import jwt from "jsonwebtoken";
 const secretKey = "secret";
 
@@ -39,4 +40,23 @@ const authRole = (role) => (req, res, next) => {
   next();
 };
 
-export { handleError, logger, authenticate };
+const validateUser = (req, res, next) => {
+  const { name, email } = req.body;
+
+  if (!name || !email) {
+    return res.status(400).json({ message: "Missing user data" });
+  }
+
+  db.get("SELECT * FROM users WHERE email = ?", [email], (err, row) => {
+    if (err) return console.error(err);
+
+    if (row)
+      return res
+        .status(400)
+        .json({ message: "User with this email already exists" });
+
+    next();
+  });
+};
+
+export { handleError, logger, authenticate , authRole, validateUser};
