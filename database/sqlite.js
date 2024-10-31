@@ -1,7 +1,19 @@
 import sqlite3 from "sqlite3";
-import { handleError } from "../middlewares/middlewares.js";
+import path from "path"; 
+import { fileURLToPath } from "url"; 
 
-const db = new sqlite3.Database("../users.db3", handleError);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const dbPath = path.join(__dirname, "../database/users.db3");
+
+const db = new sqlite3.Database(dbPath, (err) => {
+  if (err) {
+    console.error("Error connecting to the database:", err.message);
+  } else {
+    console.log("Connected to the SQLite database.");
+  }
+});
 
 db.serialize(() => {
   db.run(
@@ -13,11 +25,10 @@ db.serialize(() => {
       password TEXT NOT NULL,
       role TEXT NOT NULL
     )
-    `,
-    handleError
+    `
   );
 
-  db.run("SELECT COUNT(*) as count FROM users", (err, row) => {
+  db.get("SELECT COUNT(*) AS count FROM users", (err, row) => {
     if (err) return console.error(`Error checking users count: ${err.message}`);
 
     if (row.count === 0) {
@@ -49,9 +60,11 @@ db.serialize(() => {
         "$2y$10$wK5HB9vzu5NKCAiTYbl1lOKKa3DfvtGXQjL110wLNlnauOl/wgTTG",
         "user",
         (err) => {
-          err
-            ? console.error("Error inserting initial users")
-            : console.log("Initial users loaded succesfuly");
+          if (err) {
+            console.error("Error inserting initial users");
+          } else {
+            console.log("Initial users loaded successfully");
+          }
         }
       );
       inserStmt.finalize();

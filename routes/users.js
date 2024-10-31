@@ -6,16 +6,16 @@ import {
   handleError,
   logger,
   validateUser,
-} from "../middlewares/middlewares";
-import db from "../database/sqlite";
+} from "../middlewares/middlewares.js";
+import db from "../database/sqlite.js";
 
-const router = express.router();
+const router = express.Router();
 router.use(handleError, logger);
 
-router.get("/", authenticate, authorize("admin"), (req, res) => {
-  db.get("SELECT * FROM users", [], (err, rows) => {
+router.get("/", authenticate, authorize("admin"), (req, res, next) => {
+  db.all("SELECT * FROM users", [], (err, rows) => {
     if (err) return next(err);
-    req.json({ rows });
+    res.json({ rows });
   });
 });
 
