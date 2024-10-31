@@ -78,4 +78,72 @@ router.put("/:id", authenticate, (req, res, next) => {
   );
 });
 
+router.put("/:id/change-password", authenticate, async (req, res, next) => {
+    const userId = parseInt(req.params.id);
+    const { oldPassword, newPassword } = req.body;
+  
+    if (!oldPassword || !newPassword) {
+      return res
+        .status(400)
+        .json({ message: "Please provide both old and new passwords." });
+    }
+  
+    if (newPassword.length < 6) {
+      return res.status(400).json({
+        message: "The new password must be at least 6 characters long.",
+      });
+    }
+  
+    if (userId !== req.user.id) {
+      return res
+        .status(403)
+        .json({
+          id: userId,
+          message: "You do not have permission to change this user's password.",
+        });
+    }
+  
+    try {
+      db.get(
+        "SELECT password FROM users WHERE id = ?",
+        [userId],
+        async (err, row) => {
+          if (err) return next(err);
+  
+          if (!row) {
+            return res.status(404).json({ message: "User not found." });
+          }
+  
+          const isMatch = await bcrypt.compare(oldPassword, row.password);
+          if (!isMatch) {
+            return res
+              .status(400)
+              .json({ message: "The old password is incorrect." });
+          }
+  
+          if (oldPassword === newPassword) {
+            return res.status(400).json({
+              message: "The new password cannot be the same as the old password.",
+            });
+          }
+  
+          const salt = await bcrypt.genSalt(10);
+          const hashedPassword = await bcrypt.hash(newPassword, salt);
+  
+          db.run(
+            "UPDATE users SET password = ? WHERE id = ?",
+            [hashedPassword, userId],
+            (updateErr) => {
+              if (updateErr) return next(updateErr);
+              res.status(200).json({ message: "Password updated successfully." });
+            }
+          );
+        }
+      );
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+
 export default router;
