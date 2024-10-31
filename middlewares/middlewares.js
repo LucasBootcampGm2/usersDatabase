@@ -59,4 +59,4 @@ const validateUser = (req, res, next) => {
   });
 };
 
-export { handleError, logger, authenticate , authorize, validateUser};
+export { handleError, logger, authenticate, authorize, validateUser };
