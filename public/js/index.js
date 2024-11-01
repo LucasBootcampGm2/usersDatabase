@@ -1,9 +1,10 @@
 import express from "express";
 import userRouter from "../../routes/users.js";
 import { handleError, logger } from "../../middlewares/middlewares.js";
+import dotenv from "dotenv";
 
 dotenv.config();
-const port = process.env.PORT 
+const port = process.env.PORT;
 
 const app = express();
 

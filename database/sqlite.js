@@ -5,11 +5,9 @@ dotenv.config();
 const dbPath = process.env.DB_PATH;
 
 const db = new sqlite3.Database(dbPath, (err) => {
-  if (err) {
-    console.error("Error connecting to the database:", err.message);
-  } else {
-    console.log("Connected to the SQLite database.");
-  }
+  err
+    ? console.error("Error connecting to the database:", err.message)
+    : console.log("Connected to the SQLite database.");
 });
 
 db.serialize(() => {
@@ -57,11 +55,9 @@ db.serialize(() => {
         "$2y$10$wK5HB9vzu5NKCAiTYbl1lOKKa3DfvtGXQjL110wLNlnauOl/wgTTG",
         "user",
         (err) => {
-          if (err) {
-            console.error("Error inserting initial users");
-          } else {
-            console.log("Initial users loaded successfully");
-          }
+          err
+            ? console.error("Error inserting initial users")
+            : console.log("Initial users loaded successfully");
         }
       );
       inserStmt.finalize();
