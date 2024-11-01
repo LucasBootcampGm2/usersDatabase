@@ -193,8 +193,18 @@ router.put("/:id/change-password", authenticate, async (req, res, next) => {
 
 router.delete("/:id", authenticate, (req, res, next) => {
   const id = parseInt(req.params.id);
-  db.run("DELETE FROM users WHERE id = ?", id, function (err) {
+
+  if (isNaN(id)) return res.status(400).json({ message: "Invalid user ID" });
+
+  if (req.user.id !== id) {
+    return res
+      .status(403)
+      .json({ message: "You do not have permission to delete this user" });
+  }
+
+  db.run("DELETE FROM users WHERE id = ?", [id], (err) => {
     if (err) return next(err);
+
     this.changes > 0
       ? res.status(200).json({ message: `User ${id} deleted` })
       : res.status(404).json({ message: "User not found" });
@@ -221,4 +231,3 @@ router.post("/login", (req, res) => {
 });
 
 export default router;
-
