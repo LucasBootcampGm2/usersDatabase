@@ -26,6 +26,9 @@ router.get("/", authenticate, authorize("admin"), (req, res, next) => {
 
 router.get("/:id", authenticate, (req, res, next) => {
   const id = parseInt(req.params.id);
+  if (id !== req.user.id) {
+    return res.status(403).json({ message: "Access denied" });
+  }
   db.get("SELECT * FROM users WHERE id = ?", [id], (err, row) => {
     if (err) return next(err);
     row
@@ -49,38 +52,85 @@ router.post("/", validateUser, (req, res, next) => {
   );
 });
 
-router.patch("/:id", authenticate, (req, res, next) => {
+router.patch("/:id", authenticate, async (req, res, next) => {
   const id = parseInt(req.params.id);
-  const { name, email } = req.body;
-  if (!name || !email)
-    return res.status(400).json({ message: "All fields are required" });
+  if (id !== req.user.id) {
+    return res.status(403).json({ message: "Access denied" });
+  }
 
-  db.run(
-    "UPDATE users SET name = ?, email = ? WHERE id = ?",
-    [name, email, id],
-    function (err) {
-      if (err) return next(err);
-      this.changes > 0
-        ? res.status(200).json({ id, name, email })
-        : res.status(404).json({ message: "User not found" });
+  const { name, email } = req.body;
+  if (!name || !email) {
+    return res.status(400).json({ message: "All fields are required" });
+  }
+
+  try {
+    const existingUser = await new Promise((resolve, reject) => {
+      db.get(
+        "SELECT * FROM users WHERE email = ? AND id != ?",
+        [email, id],
+        (err, row) => {
+          if (err) return reject(err);
+          resolve(row);
+        }
+      );
+    });
+
+    if (existingUser) {
+      return res.status(409).json({ message: "Email already in use" });
     }
-  );
+
+    db.run(
+      "UPDATE users SET name = ?, email = ? WHERE id = ?",
+      [name, email, id],
+      function (err) {
+        if (err) return next(err);
+        this.changes > 0
+          ? res.status(200).json({ id, name, email })
+          : res.status(404).json({ message: "User not found" });
+      }
+    );
+  } catch (err) {
+    next(err);
+  }
 });
 
-router.put("/:id", authenticate, (req, res, next) => {
-  const id = req.params.id;
+router.put("/:id", authenticate, async (req, res, next) => {
+  const id = parseInt(req.params.id);
+  if (id !== req.user.id) {
+    return res.status(403).json({ message: "Access denied" });
+  }
+
   const { name, email } = req.body;
 
-  db.run(
-    "UPDATE users SET name = ?, email = ? WHERE id = ?",
-    [name, email, id],
-    function (err) {
-      if (err) return next(err);
-      this.changes > 0
-        ? res.status(200).json({ id, name, email })
-        : res.status(404).json({ message: "User not found" });
+  try {
+    const existingUser = await new Promise((resolve, reject) => {
+      db.get(
+        "SELECT * FROM users WHERE email = ? AND id != ?",
+        [email, id],
+        (err, row) => {
+          if (err) return reject(err);
+          resolve(row);
+        }
+      );
+    });
+
+    if (existingUser) {
+      return res.status(409).json({ message: "Email already in use" });
     }
-  );
+
+    db.run(
+      "UPDATE users SET name = ?, email = ? WHERE id = ?",
+      [name, email, id],
+      function (err) {
+        if (err) return next(err);
+        this.changes > 0
+          ? res.status(200).json({ id, name, email })
+          : res.status(404).json({ message: "User not found" });
+      }
+    );
+  } catch (err) {
+    next(err);
+  }
 });
 
 router.put("/:id/change-password", authenticate, async (req, res, next) => {
