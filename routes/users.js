@@ -40,6 +40,8 @@ router.get("/:id", authenticate, (req, res, next) => {
 router.post("/", validateUser, (req, res, next) => {
   const { name, email, password, role } = req.body;
 
+  if (!password) return res.status(400).json({ message: "Missing user data" });
+
   const hashedPassword = bcrypt.hashSync(password, 10);
 
   db.run(
@@ -52,16 +54,12 @@ router.post("/", validateUser, (req, res, next) => {
   );
 });
 
-router.patch("/:id", authenticate, async (req, res, next) => {
+router.patch("/:id", authenticate, validateUser, async (req, res, next) => {
   const id = parseInt(req.params.id);
-  if (id !== req.user.id) {
-    return res.status(403).json({ message: "Access denied" });
-  }
-
   const { name, email } = req.body;
-  if (!name || !email) {
-    return res.status(400).json({ message: "All fields are required" });
-  }
+
+  if (id !== req.user.id)
+    return res.status(403).json({ message: "Access denied" });
 
   try {
     const existingUser = await new Promise((resolve, reject) => {
@@ -75,9 +73,8 @@ router.patch("/:id", authenticate, async (req, res, next) => {
       );
     });
 
-    if (existingUser) {
+    if (existingUser)
       return res.status(409).json({ message: "Email already in use" });
-    }
 
     db.run(
       "UPDATE users SET name = ?, email = ? WHERE id = ?",
@@ -96,9 +93,8 @@ router.patch("/:id", authenticate, async (req, res, next) => {
 
 router.put("/:id", authenticate, async (req, res, next) => {
   const id = parseInt(req.params.id);
-  if (id !== req.user.id) {
+  if (id !== req.user.id)
     return res.status(403).json({ message: "Access denied" });
-  }
 
   const { name, email } = req.body;
 
@@ -114,9 +110,8 @@ router.put("/:id", authenticate, async (req, res, next) => {
       );
     });
 
-    if (existingUser) {
+    if (existingUser)
       return res.status(409).json({ message: "Email already in use" });
-    }
 
     db.run(
       "UPDATE users SET name = ?, email = ? WHERE id = ?",
@@ -193,9 +188,7 @@ router.put("/:id/change-password", authenticate, async (req, res, next) => {
 
 router.delete("/:id", authenticate, (req, res, next) => {
   const id = parseInt(req.params.id);
-
-  if (isNaN(id)) return res.status(400).json({ message: "Invalid user ID" });
-
+  
   if (req.user.id !== id) {
     return res
       .status(403)
@@ -213,9 +206,8 @@ router.delete("/:id", authenticate, (req, res, next) => {
 
 router.post("/login", (req, res) => {
   const { email, password } = req.body;
-  if (!email || !password) {
+  if (!email || !password)
     return res.status(400).json({ message: "Email and password are required" });
-  }
 
   db.get("SELECT * FROM users WHERE email = ?", [email], (err, user) => {
     if (err) return res.status(500).json({ message: "Database error" });

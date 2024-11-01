@@ -47,9 +47,8 @@ const authorize = (role) => (req, res, next) => {
 const validateUser = (req, res, next) => {
   const { name, email } = req.body;
 
-  if (!name || !email) {
+  if (!name || !email)
     return res.status(400).json({ message: "Missing user data" });
-  }
 
   db.get("SELECT * FROM users WHERE email = ?", [email], (err, row) => {
     if (err) return console.error(err);
