@@ -89,15 +89,15 @@ router.put("/:id/change-password", authenticate, async (req, res, next) => {
   }
 
   if (newPassword.length < 6) {
-    return res.status(400).json({
-      message: "The new password must be at least 6 characters long.",
+    return res.status(401).json({
+      message: "Invalid Password",
     });
   }
 
   if (userId !== req.user.id) {
     return res.status(403).json({
       id: userId,
-      message: "You do not have permission to change this user's password.",
+      message: "Permission denied",
     });
   }
 
@@ -113,16 +113,9 @@ router.put("/:id/change-password", authenticate, async (req, res, next) => {
         }
 
         const isMatch = await bcrypt.compare(oldPassword, row.password);
-        if (!isMatch) {
-          return res
-            .status(400)
-            .json({ message: "The old password is incorrect." });
-        }
 
-        if (oldPassword === newPassword) {
-          return res.status(400).json({
-            message: "The new password cannot be the same as the old password.",
-          });
+        if (!isMatch || oldPassword === newPassword) {
+          return res.status(401).json({ message: "Invalid Password" });
         }
 
         const salt = await bcrypt.genSalt(10);
@@ -161,7 +154,7 @@ router.post("/login", (req, res) => {
 
   db.get("SELECT * FROM users WHERE email = ?", [email], (err, user) => {
     if (err) return res.status(500).json({ message: "Database error" });
-    if (!user) return res.status(401).json({ message: "User not found" });
+    if (!user) return res.status(404).json({ message: "User not found" });
 
     const passwordMatch = bcrypt.compareSync(password, user.password);
     if (!passwordMatch) {
