@@ -117,9 +117,11 @@ router.put("/:id/change-password", authenticate, async (req, res, next) => {
 
         const isMatch = await bcrypt.compare(oldPassword, row.password);
 
-        if (!isMatch || oldPassword === newPassword) {
+        if (!isMatch)
           return res.status(401).json({ message: "Invalid Password" });
-        }
+
+        if (oldPassword === newPassword)
+          return res.status(409).json({ message: "Invalid Password" });
 
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(newPassword, salt);
