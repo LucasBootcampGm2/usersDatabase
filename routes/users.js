@@ -14,7 +14,7 @@ import db from "../database/sqlite.js";
 const router = express.Router();
 router.use(handleError, logger);
 
-dotenv.config(); 
+dotenv.config();
 const secretKey = process.env.SECRET_KEY;
 
 router.get("/", authenticate, authorize("admin"), (req, res, next) => {
@@ -113,9 +113,7 @@ router.put("/:id/change-password", authenticate, async (req, res, next) => {
       async (err, row) => {
         if (err) return next(err);
 
-        if (!row) {
-          return res.status(404).json({ message: "User not found." });
-        }
+        if (!row) return res.status(404).json({ message: "User not found." });
 
         const isMatch = await bcrypt.compare(oldPassword, row.password);
 
@@ -162,9 +160,8 @@ router.post("/login", (req, res) => {
     if (!user) return res.status(404).json({ message: "User not found" });
 
     const passwordMatch = bcrypt.compareSync(password, user.password);
-    if (!passwordMatch) {
+    if (!passwordMatch)
       return res.status(401).json({ message: "Invalid credentials" });
-    }
 
     const token = jwt.sign({ id: user.id, role: user.role }, secretKey);
     res.json({ id: user.id, token });
