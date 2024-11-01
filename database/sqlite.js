@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 const dbPath = process.env.DB_PATH;
+const users = JSON.parse(process.env.EXAMPLE_USERS);
 
 const db = new sqlite3.Database(dbPath, (err) => {
   err
@@ -27,40 +28,19 @@ db.serialize(() => {
     if (err) return console.error(`Error checking users count: ${err.message}`);
 
     if (row.count === 0) {
-      const inserStmt = db.prepare(
-        `INSERT INTO users (name,email,password,role) VALUES (?,?,?,?)`
-      );
+      const sql =
+        "INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)";
+      const insertStmt = db.prepare(sql);
 
-      inserStmt.run(
-        "Lucas",
-        "lucas.berardi@gm2dev.com",
-        "$2y$10$F61Yn7DNf4e.0XQBZykxr.gzo5uA75rgtuYx.gTptiZB9JuWoWWc6",
-        "admin"
-      );
-      inserStmt.run(
-        "Matias",
-        "matias.berardi@gm2dev.com",
-        "$2y$10$Glb0q0gjhqA/m6fxW9sWPePsOkyGbALrqKzIWO4OUr2PRR4KZC0ky",
-        "user"
-      );
-      inserStmt.run(
-        "Jorge",
-        "jorge.berardi@gm2dev.com",
-        "$2y$10$4jW0WH4dM1UfR2ba.yfMAuIn6.AsY8KYnnRabwmZDWRYvYM4ONf7y",
-        "user"
-      );
-      inserStmt.run(
-        "martin",
-        "martin.berardi@gm2dev.com",
-        "$2y$10$wK5HB9vzu5NKCAiTYbl1lOKKa3DfvtGXQjL110wLNlnauOl/wgTTG",
-        "user",
-        (err) => {
-          err
-            ? console.error("Error inserting initial users")
-            : console.log("Initial users loaded successfully");
-        }
-      );
-      inserStmt.finalize();
+      users.forEach(({ name, email, password, role }) => {
+        insertStmt.run(name, email, password, role);
+      });
+
+      insertStmt.finalize((err) => {
+        err
+          ? console.error("Error inserting initial users:", err)
+          : console.log("Initial users loaded successfully");
+      });
     } else {
       console.log("The users table is not empty, no initial users added.");
     }
