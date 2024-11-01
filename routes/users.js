@@ -1,5 +1,7 @@
 import express from "express";
 import bcrypt from "bcrypt";
+import dotenv from "dotenv";
+import jwt from "jsonwebtoken";
 import {
   authenticate,
   authorize,
@@ -11,6 +13,9 @@ import db from "../database/sqlite.js";
 
 const router = express.Router();
 router.use(handleError, logger);
+
+dotenv.config(); 
+const secretKey = process.env.SECRET_KEY;
 
 router.get("/", authenticate, authorize("admin"), (req, res, next) => {
   db.all("SELECT * FROM users", [], (err, rows) => {

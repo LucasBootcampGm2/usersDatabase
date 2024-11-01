@@ -1,11 +1,8 @@
 import sqlite3 from "sqlite3";
-import path from "path"; 
-import { fileURLToPath } from "url"; 
+import dotenv from "dotenv";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const dbPath = path.join(__dirname, "../database/users.db3");
+dotenv.config();
+const dbPath = process.env.DB_PATH;
 
 const db = new sqlite3.Database(dbPath, (err) => {
   if (err) {

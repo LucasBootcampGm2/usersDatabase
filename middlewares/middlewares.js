@@ -1,6 +1,10 @@
 import db from "../database/sqlite.js";
 import jwt from "jsonwebtoken";
-const secretKey = "secret";
+import dotenv from "dotenv";
+
+dotenv.config();
+
+const secretKey = process.env.SECRET_KEY;
 
 const handleError = (err, req, res, next) => {
   const statusCode =
