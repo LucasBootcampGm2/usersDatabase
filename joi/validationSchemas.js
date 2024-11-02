@@ -11,3 +11,8 @@ const updatedSchema = Joi.object({
   name: Joi.string().required(),
   email: Joi.string().email().required(),
 });
+
+const changePasswordSchema = Joi.object({
+  oldPassword: Joi.string().min(6).required(),
+  newPassword: Joi.string().min(6).required(),
+});
