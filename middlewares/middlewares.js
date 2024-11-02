@@ -3,7 +3,6 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 
 dotenv.config();
-
 const secretKey = process.env.SECRET_KEY;
 
 const handleError = (err, req, res, next) => {
@@ -26,11 +25,12 @@ const authenticate = (req, res, next) => {
   const header = req.headers["authorization"];
   const token = header && header.split(" ")[1];
 
-  if (!token) return res.status(401).json({ message: "Token not provide" });
+  if (!token) return res.status(401).json({ message: "Token not provided" });
 
   try {
     const payload = jwt.verify(token, secretKey);
     req.user = payload;
+
     next();
   } catch (error) {
     return res.status(403).json({ message: "Invalid Token" });
@@ -38,21 +38,17 @@ const authenticate = (req, res, next) => {
 };
 
 const authorize = (role) => (req, res, next) => {
-  if (req.user.role !== role) {
+  if (req.user.role !== role)
     return res.status(403).json({ message: "Access denied" });
-  }
+
   next();
 };
 
 const validateUser = (req, res, next) => {
-  const { name, email } = req.body;
-
-  if (!name || !email) {
-    return res.status(400).json({ message: "Missing user data" });
-  }
+  const { email } = req.body;
 
   db.get("SELECT * FROM users WHERE email = ?", [email], (err, row) => {
-    if (err) return console.error(err);
+    if (err) return next(err);
 
     if (row)
       return res

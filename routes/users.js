@@ -10,6 +10,12 @@ import {
   validateUser,
 } from "../middlewares/middlewares.js";
 import db from "../database/sqlite.js";
+import {
+  userSchema,
+  updatedSchema,
+  changePasswordSchema,
+  loginSchema,
+} from "../joi/validationSchemas.js";
 
 const router = express.Router();
 router.use(handleError, logger);
@@ -37,19 +43,23 @@ router.get("/:id", authenticate, (req, res, next) => {
   });
 });
 
-router.post("/", validateUser, (req, res, next) => {
-  const { name, email, password, role } = req.body;
+router.post("/", validateUser, async (req, res, next) => {
+  try {
+    await userSchema.validateAsync(req.body);
+    const { name, email, password, role } = req.body;
+    const hashedPassword = bcrypt.hashSync(password, 10);
 
-  const hashedPassword = bcrypt.hashSync(password, 10);
-
-  db.run(
-    "INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)",
-    [name, email, hashedPassword, role || "user"],
-    function (err) {
-      if (err) return next(err);
-      res.status(201).json({ id: this.lastID, name, email });
-    }
-  );
+    db.run(
+      "INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)",
+      [name, email, hashedPassword, role || "user"],
+      function (err) {
+        if (err) return next(err);
+        res.status(201).json({ id: this.lastID, name, email });
+      }
+    );
+  } catch (error) {
+    next(error);
+  }
 });
 
 router.patch("/:id", authenticate, async (req, res, next) => {
@@ -58,12 +68,10 @@ router.patch("/:id", authenticate, async (req, res, next) => {
     return res.status(403).json({ message: "Access denied" });
   }
 
-  const { name, email } = req.body;
-  if (!name || !email) {
-    return res.status(400).json({ message: "All fields are required" });
-  }
-
   try {
+    await updatedSchema.validateAsync(req.body);
+    const { name, email } = req.body;
+
     const existingUser = await new Promise((resolve, reject) => {
       db.get(
         "SELECT * FROM users WHERE email = ? AND id != ?",
@@ -100,9 +108,10 @@ router.put("/:id", authenticate, async (req, res, next) => {
     return res.status(403).json({ message: "Access denied" });
   }
 
-  const { name, email } = req.body;
-
   try {
+    await updatedSchema.validateAsync(req.body);
+    const { name, email } = req.body;
+
     const existingUser = await new Promise((resolve, reject) => {
       db.get(
         "SELECT * FROM users WHERE email = ? AND id != ?",
@@ -135,55 +144,38 @@ router.put("/:id", authenticate, async (req, res, next) => {
 
 router.put("/:id/change-password", authenticate, async (req, res, next) => {
   const userId = parseInt(req.params.id);
-  const { oldPassword, newPassword } = req.body;
-
-  if (!oldPassword || !newPassword) {
-    return res
-      .status(400)
-      .json({ message: "Please provide both old and new passwords." });
-  }
-
-  if (newPassword.length < 6) {
-    return res.status(401).json({
-      message: "Invalid Password",
-    });
-  }
-
-  if (userId !== req.user.id) {
-    return res.status(403).json({
-      id: userId,
-      message: "Permission denied",
-    });
-  }
 
   try {
-    db.get(
-      "SELECT password FROM users WHERE id = ?",
-      [userId],
-      async (err, row) => {
+    await changePasswordSchema.validateAsync(req.body);
+    const { oldPassword, newPassword } = req.body;
+
+    if (userId !== req.user.id) {
+      return res.status(403).json({ message: "Permission denied" });
+    }
+
+    const row = await new Promise((resolve, reject) => {
+      db.get("SELECT * FROM users WHERE id = ?", [userId], (err, row) => {
+        if (err) return reject(err);
+        resolve(row);
+      });
+    });
+
+    if (!row) return res.status(404).json({ message: "User not found." });
+
+    const isMatch = await bcrypt.compare(oldPassword, row.password);
+    if (!isMatch)
+      return res.status(401).json({ message: "Invalid old password" });
+
+    const hashedPassword = await bcrypt.hash(
+      newPassword,
+      await bcrypt.genSalt(10)
+    );
+    db.run(
+      "UPDATE users SET password = ? WHERE id = ?",
+      [hashedPassword, userId],
+      function (err) {
         if (err) return next(err);
-
-        if (!row) return res.status(404).json({ message: "User not found." });
-
-        const isMatch = await bcrypt.compare(oldPassword, row.password);
-
-        if (!isMatch)
-          return res.status(401).json({ message: "Invalid Password" });
-
-        if (oldPassword === newPassword)
-          return res.status(409).json({ message: "Invalid Password" });
-
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(newPassword, salt);
-
-        db.run(
-          "UPDATE users SET password = ? WHERE id = ?",
-          [hashedPassword, userId],
-          (updateErr) => {
-            if (updateErr) return next(updateErr);
-            res.status(200).json({ message: "Password updated successfully." });
-          }
-        );
+        res.status(200).json({ message: "Password updated successfully." });
       }
     );
   } catch (error) {
@@ -193,41 +185,39 @@ router.put("/:id/change-password", authenticate, async (req, res, next) => {
 
 router.delete("/:id", authenticate, (req, res, next) => {
   const id = parseInt(req.params.id);
-
-  if (isNaN(id)) return res.status(400).json({ message: "Invalid user ID" });
-
   if (req.user.id !== id) {
     return res
       .status(403)
       .json({ message: "You do not have permission to delete this user" });
   }
 
-  db.run("DELETE FROM users WHERE id = ?", [id], (err) => {
+  db.run("DELETE FROM users WHERE id = ?", [id], function (err) {
     if (err) return next(err);
-
     this.changes > 0
       ? res.status(200).json({ message: `User ${id} deleted` })
       : res.status(404).json({ message: "User not found" });
   });
 });
 
-router.post("/login", (req, res) => {
-  const { email, password } = req.body;
-  if (!email || !password) {
-    return res.status(400).json({ message: "Email and password are required" });
+router.post("/login", async (req, res, next) => {
+  try {
+    await loginSchema.validateAsync(req.body);
+    const { email, password } = req.body;
+
+    db.get("SELECT * FROM users WHERE email = ?", [email], (err, user) => {
+      if (err) return next(err);
+      if (!user) return res.status(404).json({ message: "User not found" });
+
+      const passwordMatch = bcrypt.compareSync(password, user.password);
+      if (!passwordMatch)
+        return res.status(401).json({ message: "Invalid credentials" });
+
+      const token = jwt.sign({ id: user.id, role: user.role }, secretKey);
+      res.json({ id: user.id, token });
+    });
+  } catch (error) {
+    next(error);
   }
-
-  db.get("SELECT * FROM users WHERE email = ?", [email], (err, user) => {
-    if (err) return res.status(500).json({ message: "Database error" });
-    if (!user) return res.status(404).json({ message: "User not found" });
-
-    const passwordMatch = bcrypt.compareSync(password, user.password);
-    if (!passwordMatch)
-      return res.status(401).json({ message: "Invalid credentials" });
-
-    const token = jwt.sign({ id: user.id, role: user.role }, secretKey);
-    res.json({ id: user.id, token });
-  });
 });
 
 export default router;
