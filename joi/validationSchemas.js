@@ -18,8 +18,8 @@ const changePasswordSchema = Joi.object({
 });
 
 const loginSchema = Joi.object({
-    email: Joi.string().email().required(),
-    password: Joi.string().min(6).required(),
-  });
-  
-  export { userSchema, updatedSchema, changePasswordSchema, loginSchema };
+  email: Joi.string().email().required(),
+  password: Joi.string().min(6).required(),
+});
+
+export { userSchema, updatedSchema, changePasswordSchema, loginSchema };
