@@ -1,6 +1,7 @@
 import db from "../database/sqlite.js";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import { validationResult } from "express-validator";
 
 dotenv.config();
 const secretKey = process.env.SECRET_KEY;
