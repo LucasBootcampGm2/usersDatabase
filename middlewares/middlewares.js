@@ -6,13 +6,16 @@ dotenv.config();
 const secretKey = process.env.SECRET_KEY;
 
 const handleError = (err, req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   const statusCode =
     err.status || (err.code && err.code.startsWith("SQLITE") ? 500 : 400);
-
   const errorMessage = err.message || "Unknown error";
 
   console.error("Error stack:", err.stack);
-
   res.status(statusCode).json({ error: errorMessage });
 };
 
