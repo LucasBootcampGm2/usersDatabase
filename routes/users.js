@@ -7,15 +7,14 @@ import {
   authorize,
   handleError,
   logger,
-  validateUser,
 } from "../middlewares/middlewares.js";
 import db from "../database/sqlite.js";
 import {
-  userSchema,
-  updatedSchema,
-  changePasswordSchema,
-  loginSchema,
-} from "../joi/validationSchemas.js";
+  validateLogin,
+  validateParcialUpdate,
+  validatePasswordChange,
+  validateUser,
+} from "../validation/expressValidation.js";
 
 const router = express.Router();
 router.use(handleError, logger);
@@ -43,33 +42,30 @@ router.get("/:id", authenticate, (req, res, next) => {
   });
 });
 
-router.post("/", validateUser, async (req, res, next) => {
-  try {
-    await userSchema.validateAsync(req.body);
-    const { name, email, password, role } = req.body;
-    const hashedPassword = bcrypt.hashSync(password, 10);
+router.post("/", validateUser, (req, res, next) => {
+  const { name, email, password, role } = req.body;
+  const hashedPassword = bcrypt.hashSync(password, 10);
 
-    db.run(
-      "INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)",
-      [name, email, hashedPassword, role || "user"],
-      function (err) {
-        if (err) return next(err);
-        res.status(201).json({ id: this.lastID, name, email });
-      }
-    );
-  } catch (error) {
-    next(error);
-  }
+  db.run(
+    "INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)",
+    [name, email, hashedPassword, role || "user"],
+    function (err) {
+      if (err) return next(err);
+      res.status(201).json({ id: this.lastID, name, email });
+    }
+  );
 });
 
-router.patch("/:id", authenticate, async (req, res, next) => {
-  const id = parseInt(req.params.id);
-  if (id !== req.user.id) {
-    return res.status(403).json({ message: "Access denied" });
-  }
+router.patch(
+  "/:id",
+  authenticate,
+  validateParcialUpdate,
+  async (req, res, next) => {
+    const id = parseInt(req.params.id);
+    if (id !== req.user.id) {
+      return res.status(403).json({ message: "Access denied" });
+    }
 
-  try {
-    await updatedSchema.validateAsync(req.body);
     const { name, email } = req.body;
 
     const existingUser = await new Promise((resolve, reject) => {
@@ -97,56 +93,51 @@ router.patch("/:id", authenticate, async (req, res, next) => {
           : res.status(404).json({ message: "User not found" });
       }
     );
-  } catch (err) {
-    next(err);
   }
-});
+);
 
-router.put("/:id", authenticate, async (req, res, next) => {
+router.put("/:id", authenticate, validateUser, async (req, res, next) => {
   const id = parseInt(req.params.id);
   if (id !== req.user.id) {
     return res.status(403).json({ message: "Access denied" });
   }
 
-  try {
-    await updatedSchema.validateAsync(req.body);
-    const { name, email } = req.body;
+  const { name, email } = req.body;
 
-    const existingUser = await new Promise((resolve, reject) => {
-      db.get(
-        "SELECT * FROM users WHERE email = ? AND id != ?",
-        [email, id],
-        (err, row) => {
-          if (err) return reject(err);
-          resolve(row);
-        }
-      );
-    });
-
-    if (existingUser) {
-      return res.status(409).json({ message: "Email already in use" });
-    }
-
-    db.run(
-      "UPDATE users SET name = ?, email = ? WHERE id = ?",
-      [name, email, id],
-      function (err) {
-        if (err) return next(err);
-        this.changes > 0
-          ? res.status(200).json({ id, name, email })
-          : res.status(404).json({ message: "User not found" });
+  const existingUser = await new Promise((resolve, reject) => {
+    db.get(
+      "SELECT * FROM users WHERE email = ? AND id != ?",
+      [email, id],
+      (err, row) => {
+        if (err) return reject(err);
+        resolve(row);
       }
     );
-  } catch (err) {
-    next(err);
+  });
+
+  if (existingUser) {
+    return res.status(409).json({ message: "Email already in use" });
   }
+
+  db.run(
+    "UPDATE users SET name = ?, email = ? WHERE id = ?",
+    [name, email, id],
+    function (err) {
+      if (err) return next(err);
+      this.changes > 0
+        ? res.status(200).json({ id, name, email })
+        : res.status(404).json({ message: "User not found" });
+    }
+  );
 });
 
-router.put("/:id/change-password", authenticate, async (req, res, next) => {
-  const userId = parseInt(req.params.id);
+router.put(
+  "/:id/change-password",
+  authenticate,
+  validatePasswordChange,
+  async (req, res, next) => {
+    const userId = parseInt(req.params.id);
 
-  try {
-    await changePasswordSchema.validateAsync(req.body);
     const { oldPassword, newPassword } = req.body;
 
     if (userId !== req.user.id) {
@@ -166,6 +157,10 @@ router.put("/:id/change-password", authenticate, async (req, res, next) => {
     if (!isMatch)
       return res.status(401).json({ message: "Invalid old password" });
 
+    const isSamePassword = await bcrypt.compare(oldPassword, newPassword);
+    if (isSamePassword)
+      return res.status(401).json({ message: "Invalid new password" });
+
     const hashedPassword = await bcrypt.hash(
       newPassword,
       await bcrypt.genSalt(10)
@@ -178,10 +173,8 @@ router.put("/:id/change-password", authenticate, async (req, res, next) => {
         res.status(200).json({ message: "Password updated successfully." });
       }
     );
-  } catch (error) {
-    next(error);
   }
-});
+);
 
 router.delete("/:id", authenticate, (req, res, next) => {
   const id = parseInt(req.params.id);
@@ -199,25 +192,20 @@ router.delete("/:id", authenticate, (req, res, next) => {
   });
 });
 
-router.post("/login", async (req, res, next) => {
-  try {
-    await loginSchema.validateAsync(req.body);
-    const { email, password } = req.body;
+router.post("/login", validateLogin, async (req, res, next) => {
+  const { email, password } = req.body;
 
-    db.get("SELECT * FROM users WHERE email = ?", [email], (err, user) => {
-      if (err) return next(err);
-      if (!user) return res.status(404).json({ message: "User not found" });
+  db.get("SELECT * FROM users WHERE email = ?", [email], (err, user) => {
+    if (err) return next(err);
+    if (!user) return res.status(404).json({ message: "User not found" });
 
-      const passwordMatch = bcrypt.compareSync(password, user.password);
-      if (!passwordMatch)
-        return res.status(401).json({ message: "Invalid credentials" });
+    const passwordMatch = bcrypt.compareSync(password, user.password);
+    if (!passwordMatch)
+      return res.status(401).json({ message: "Invalid credentials" });
 
-      const token = jwt.sign({ id: user.id, role: user.role }, secretKey);
-      res.json({ id: user.id, token });
-    });
-  } catch (error) {
-    next(error);
-  }
+    const token = jwt.sign({ id: user.id, role: user.role }, secretKey);
+    res.json({ id: user.id, token });
+  });
 });
 
 export default router;
