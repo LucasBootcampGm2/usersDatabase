@@ -1,23 +1,19 @@
 import db from "../database/sqlite.js";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
-import { validationResult } from "express-validator";
 
 dotenv.config();
 const secretKey = process.env.SECRET_KEY;
 
-const handleError = (err, req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
+const handleServerErrors = (err, req, res, next) => {
+  console.error("Error stack:", err.stack);
+  res.status(statusCode).json({ error: errorMessage });
+};
 
+const handleDbErrors = (err, req, res, next) => {
   const statusCode =
     err.status || (err.code && err.code.startsWith("SQLITE") ? 500 : 400);
   const errorMessage = err.message || "Unknown error";
-
-  console.error("Error stack:", err.stack);
-  res.status(statusCode).json({ error: errorMessage });
 };
 
 const logger = (req, res, next) => {
@@ -63,4 +59,11 @@ const validateUser = (req, res, next) => {
   });
 };
 
-export { handleError, logger, authenticate, authorize, validateUser };
+export {
+  handleServerErrors,
+  handleDbErrors,
+  logger,
+  authenticate,
+  authorize,
+  validateUser,
+};
