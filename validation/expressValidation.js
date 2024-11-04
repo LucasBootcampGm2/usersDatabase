@@ -1,12 +1,4 @@
-import { body, validationResult } from "express-validator";
-
-const handleError = (req, res, next) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-    next();
-  };
+import { body } from "express-validator";
 
 const validateUser = [
   body("name")
@@ -21,7 +13,6 @@ const validateUser = [
     .optional()
     .isIn(["admin", "user"])
     .withMessage("Role must be either 'admin' or 'user'."),
-  handleError,
 ];
 
 const validateParcialUpdate = [
@@ -31,7 +22,6 @@ const validateParcialUpdate = [
     .isLength({ min: 2 })
     .withMessage("Name should be at least 2 characters."),
   body("email").optional().isEmail().withMessage("Invalid email address."),
-  handleError,
 ];
 
 const validatePasswordChange = [
@@ -42,7 +32,6 @@ const validatePasswordChange = [
     .withMessage("Old password must be at least 6 characters long")
     .notEmpty()
     .withMessage("Old password cannot be empty"),
-
   body("newPassword")
     .exists()
     .withMessage("New password is required")
@@ -57,13 +46,11 @@ const validatePasswordChange = [
       }
       return true;
     }),
-  handleError,
 ];
 
 const validateLogin = [
   body("email").isEmail().withMessage("Invalid email address."),
-  body("password").exists().withMessage("Password is required."),
-  handleError,
+  body("password").isLength({min: 2, max: 4}).withMessage("Password Length is not ok."),
 ];
 
 export {

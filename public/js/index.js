@@ -1,6 +1,5 @@
 import express from "express";
 import userRouter from "../../routes/users.js";
-import { handleServerErrors, logger } from "../../middlewares/middlewares.js";
 import dotenv from "dotenv";
 
 dotenv.config();

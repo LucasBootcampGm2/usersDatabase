@@ -2,13 +2,7 @@ import express from "express";
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
-import {
-  authenticate,
-  authorize,
-  handleDbErrors,
-  handleServerErrors,
-  logger,
-} from "../middlewares/middlewares.js";
+import { authenticate, authorize, logger } from "../middlewares/middlewares.js";
 import db from "../database/sqlite.js";
 import {
   validateLogin,
@@ -16,9 +10,11 @@ import {
   validatePasswordChange,
   validateUser,
 } from "../validation/expressValidation.js";
+import { serverHandleErrors } from "../errorHandlers/server.js";
+import { validationHandlerErrors } from "../errorHandlers/validation.js";
 
 const router = express.Router();
-router.use(handleServerErrors, logger);
+router.use(serverHandleErrors, logger);
 
 dotenv.config();
 const secretKey = process.env.SECRET_KEY;
@@ -61,6 +57,7 @@ router.patch(
   "/:id",
   authenticate,
   validateParcialUpdate,
+  validationHandlerErrors,
   async (req, res, next) => {
     const id = parseInt(req.params.id);
     if (id !== req.user.id) {
@@ -101,6 +98,7 @@ router.put(
   "/:id",
   authenticate,
   validateUser,
+  validationHandlerErrors,
   async (req, res, next) => {
     const id = parseInt(req.params.id);
     if (id !== req.user.id) {
@@ -141,6 +139,7 @@ router.put(
   "/:id/change-password",
   authenticate,
   validatePasswordChange,
+  validationHandlerErrors,
   async (req, res, next) => {
     const id = parseInt(req.params.id);
 
@@ -196,25 +195,20 @@ router.delete("/:id", authenticate, (req, res, next) => {
   });
 });
 
-router.post(
-  "/login",
-  validateLogin,
-  handleServerErrors,
-  async (req, res, next) => {
-    const { email, password } = req.body;
+router.post("/login", validateLogin, async (req, res, next) => {
+  const { email, password } = req.body;
 
-    db.get("SELECT * FROM users WHERE email = ?", [email], (err, user) => {
-      if (err) return next(err);
-      if (!user) return res.status(404).json({ message: "User not found" });
+  db.get("SELECT * FROM users WHERE email = ?", [email], (err, user) => {
+    if (err) return next(err);
+    if (!user) return res.status(404).json({ message: "User not found" });
 
-      const passwordMatch = bcrypt.compareSync(password, user.password);
-      if (!passwordMatch)
-        return res.status(401).json({ message: "Invalid credentials" });
+    const passwordMatch = bcrypt.compareSync(password, user.password);
+    if (!passwordMatch)
+      return res.status(401).json({ message: "Invalid credentials" });
 
-      const token = jwt.sign({ id: user.id, role: user.role }, secretKey);
-      res.json({ id: user.id, token });
-    });
-  }
-);
+    const token = jwt.sign({ id: user.id, role: user.role }, secretKey);
+    res.json({ id: user.id, token });
+  });
+});
 
 export default router;
