@@ -1,50 +1,60 @@
 import winston from "winston";
 import path from "path";
+import { fileURLToPath } from "url";
+import { customLevels } from "./levels.js";
 
-const __dirname = path.dirname(new URL(import.meta.url).pathname);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+winston.addColors(customLevels.colors);
+
+const newTransport = (filePath, level) => {
+  return new winston.transports.File({
+    filename: path.resolve(__dirname, filePath),
+    level: level,
+    format: winston.format.combine(
+      winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
+      winston.format.printf(({ level, message, timestamp, stack }) => {
+        return `${timestamp} [${level.toUpperCase()}]: ${stack || message}`;
+      })
+    )
+  });
+};
 
 const logger = winston.createLogger({
-  level: "info",
+  levels: customLevels.levels,
   format: winston.format.combine(
     winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
     winston.format.errors({ stack: true }),
-    winston.format.printf(({ level, message, timestamp, stack }) => {
-      return `${timestamp} [${level.toUpperCase()}]: ${stack || message}`;
-    })
   ),
   transports: [
     new winston.transports.Console({
-      format: winston.format.simple(),
+      format: winston.format.combine(
+        winston.format.colorize({ all: true }),
+        winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
+        winston.format.printf(({ level, message, timestamp, stack }) => {
+          return `${timestamp} [${level}]: ${stack || message}`;
+        })
+      ),
     }),
-    new winston.transports.File({
-      filename: path.join(__dirname, "logs/error.log"),
-      level: "error",
-    }),
-    new winston.transports.File({
-      filename: path.join(__dirname, "logs/warnings.log"),
-      level: "warn",
-    }),
-    new winston.transports.File({
-      filename: path.join(__dirname, "logs/combined.log"),
-      level: "info",
-    }),
+    newTransport("logs/error.log", "error"),
+    newTransport("logs/warnings.log", "warn"),
+    newTransport("logs/combined.log", "info"),
   ],
   exceptionHandlers: [
     new winston.transports.File({
-      filename: path.join(__dirname, "logs/exceptions.log"),
-      level: 'error'
+      filename: path.resolve(__dirname, "logs/exceptions.log"),
     }),
   ],
   rejectionHandlers: [
     new winston.transports.File({
-      filename: path.join(__dirname, "logs/rejections.log"),
+      filename: path.resolve(__dirname, "logs/rejections.log"),
     }),
   ],
+  exitOnError: false,
 });
 
-logger.debug = (message) => logger.log("debug", message);
-logger.info = (message) => logger.log("info", message);
-logger.warn = (message) => logger.log("warn", message);
-logger.error = (message) => logger.log("error", message);
+logger.fatal = (message) => logger.log("fatal", message);
+logger.trace = (message) => logger.log("trace", message);
 
 export default logger;

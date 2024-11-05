@@ -2,17 +2,18 @@ import express, { json } from "express";
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
-import {
-  authenticate,
-  authorize,
-} from "../middlewares/middlewares.js";
+
+import { authenticate, authorize } from "../middlewares/middlewares.js";
+
 import db from "../database/sqlite.js";
+
 import {
   validateLogin,
   validateParcialUpdate,
   validatePasswordChange,
   validateUser,
 } from "../validation/expressValidation.js";
+
 import { serverHandleErrors } from "../errorHandlers/server.js";
 import { validationErrorHandler } from "../errorHandlers/validation.js";
 import logger from "../logs/logger.js";
@@ -26,7 +27,7 @@ const secretKey = process.env.SECRET_KEY;
 router.get("/", authenticate, authorize("admin"), (req, res, next) => {
   db.all("SELECT * FROM users", [], (err, rows) => {
     if (err) {
-      logger.error("Error retrieving all users: ", err.message);
+      logger.error(`Error retrieving all users: ${err.message}`);
       return next(err);
     }
     logger.info("All users retrieved successfully");
@@ -37,16 +38,16 @@ router.get("/", authenticate, authorize("admin"), (req, res, next) => {
 router.get("/:id", authenticate, (req, res, next) => {
   const id = parseInt(req.params.id);
   if (id !== req.user.id) {
-    logger.warn("Access denied for user ID: ", id);
+    logger.warn(`Access denied for user ID: ${id}`);
     return res.status(403).json({ message: "Access denied" });
   }
   db.get("SELECT * FROM users WHERE id = ?", [id], (err, row) => {
     if (err) return next(err);
     if (!row) {
-      logger.warn("User not found: ", id);
+      logger.warn(`User not found: ID ${id}`);
       return res.status(404).json({ message: "User not found" });
     }
-    logger.info("User retrieved successfully: ", { id, user: row });
+    logger.info(`User retrieved successfully: ID ${id}`);
     res.status(200).json(row);
   });
 });
@@ -64,7 +65,7 @@ router.post("/", validateUser, validationErrorHandler, (req, res, next) => {
         return next(err);
       }
       const userId = this.lastID;
-      logger.info(`User created successfully: ${userId}`);
+      logger.info(`User created successfully: ID ${userId}`);
       res.status(201).json({ id: userId, name, email });
     }
   );
@@ -78,7 +79,7 @@ router.patch(
   async (req, res, next) => {
     const id = parseInt(req.params.id);
     if (id !== req.user.id) {
-      logger.warn("Access denied for user ID: ", id);
+      logger.warn(`Access denied for user ID: ${id}`);
       return res.status(403).json({ message: "Access denied" });
     }
 
@@ -96,7 +97,7 @@ router.patch(
     });
 
     if (existingUser) {
-      logger.warn("Email already in use for: ", email);
+      logger.warn(`Email already in use: ${email}`);
       return res.status(409).json({ message: "Email already in use" });
     }
 
@@ -106,10 +107,10 @@ router.patch(
       function (err) {
         if (err) return next(err);
         if (this.changes > 0) {
-          logger.info("User updated successfully: ", { id, name, email });
+          logger.info(`User updated successfully: ID ${id}`);
           res.status(200).json({ id, name, email });
         } else {
-          logger.warn("User not found for update: ", id);
+          logger.warn(`User not found for update: ID ${id}`);
           res.status(404).json({ message: "User not found" });
         }
       }
@@ -125,7 +126,7 @@ router.put(
   async (req, res, next) => {
     const id = parseInt(req.params.id);
     if (id !== req.user.id) {
-      logger.warn("Access denied for user ID:", id);
+      logger.warn(`Access denied for user ID: ${id}`);
       return res.status(403).json({ message: "Access denied" });
     }
 
@@ -143,7 +144,7 @@ router.put(
     });
 
     if (existingUser) {
-      logger.warn("Email already in use for: ", email);
+      logger.warn(`Email already in use: ${email}`);
       return res.status(409).json({ message: "Email already in use" });
     }
 
@@ -153,10 +154,10 @@ router.put(
       function (err) {
         if (err) return next(err);
         if (this.changes > 0) {
-          logger.info("User updated successfully: ", { id, name, email });
+          logger.info(`User updated successfully: ID ${id}`);
           res.status(200).json({ id, name, email });
         } else {
-          logger.warn("User not found for update: ", id);
+          logger.warn(`User not found for update: ID ${id}`);
           res.status(404).json({ message: "User not found" });
         }
       }
@@ -174,7 +175,7 @@ router.put(
     const { oldPassword, newPassword } = req.body;
 
     if (id !== req.user.id) {
-      logger.warn(`Permission denied for user ${id}`);
+      logger.warn(`Permission denied for user ID ${id}`);
       return res.status(403).json({ message: "Permission denied" });
     }
 
@@ -186,20 +187,20 @@ router.put(
     });
 
     if (!row) {
-      logger.warn(`User ${id} not found for password change`);
-      return res.status(404).json({ message: `User ${id} not found.` });
+      logger.warn(`User not found for password change: ID ${id}`);
+      return res.status(404).json({ message: `User not found.` });
     }
 
     const isMatch = await bcrypt.compare(oldPassword, row.password);
     if (!isMatch) {
-      logger.warn(`Invalid old password attempt for user ${id}`);
+      logger.warn(`Invalid old password attempt for user ID ${id}`);
       return res.status(401).json({ message: "Invalid old password" });
     }
 
     const isSamePassword = await bcrypt.compare(oldPassword, newPassword);
     if (isSamePassword) {
       logger.warn(
-        `New password cannot be the same as old password for user ${id} `
+        `New password cannot be the same as old password for user ID ${id}`
       );
       return res.status(401).json({ message: "Invalid new password" });
     }
@@ -211,7 +212,7 @@ router.put(
       [hashedPassword, id],
       function (err) {
         if (err) return next(err);
-        logger.info(`Password updated successfully for user ${id}`);
+        logger.info(`Password updated successfully for user ID ${id}`);
         res.status(200).json({ message: "Password updated successfully." });
       }
     );
@@ -230,10 +231,10 @@ router.delete("/:id", authenticate, (req, res, next) => {
   db.run("DELETE FROM users WHERE id = ?", [id], function (err) {
     if (err) return next(err);
     if (this.changes > 0) {
-      logger.info(`User ${id} deleted successfully:`);
-      res.status(200).json({ message: `User ${id} deleted` });
+      logger.info(`User deleted successfully: ID ${id}`);
+      res.status(200).json({ message: `User deleted` });
     } else {
-      logger.warn(`User ${id} not found for deletion`);
+      logger.warn(`User not found for deletion: ID ${id}`);
       res.status(404).json({ message: "User not found" });
     }
   });
@@ -248,13 +249,11 @@ router.post(
 
     db.get("SELECT * FROM users WHERE email = ?", [email], (err, user) => {
       if (err) {
-        logger.error(
-          `Error during login attempt: ${JSON.stringify(err.message, null, 2)}`
-        );
+        logger.error(`Error during login attempt: ${err.message}`);
         return next(err);
       }
       if (!user) {
-        logger.warn(`User not found during login attempt:  ${email}`);
+        logger.warn(`User not found during login attempt: ${email}`);
         return res.status(404).json({ message: "User not found" });
       }
 
@@ -266,14 +265,7 @@ router.post(
 
       const token = jwt.sign({ id: user.id, role: user.role }, secretKey);
       logger.info(
-        `User logged in successfully: ${JSON.stringify(
-          {
-            id: user.id,
-            email,
-          },
-          null,
-          2
-        )}`
+        `User logged in successfully: ID ${user.id}, email: ${email}`
       );
       res.json({ id: user.id, token });
     });

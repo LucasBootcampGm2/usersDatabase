@@ -1,20 +1,9 @@
-2024-11-05 12:55:39 [INFO]: Request method used: POST, URL used: /users/logi
-2024-11-05 12:55:39 [INFO]: ::1 - - [05/Nov/2024:15:55:39 +0000] "POST /users/logi HTTP/1.1" 404 150 "-" "PostmanRuntime/7.42.0"
-2024-11-05 12:56:02 [INFO]: Request method used: POST, URL used: /users/logi
-2024-11-05 12:56:26 [INFO]: Request method used: POST, URL used: /users/logi
-2024-11-05 12:57:15 [INFO]: Request method used: POST, URL used: /users/logi
-2024-11-05 12:58:42 [INFO]: Request method used: POST, URL used: /users/logi
-2024-11-05 12:58:42 [INFO]: Request method used: POST, URL used: /users/logi
-2024-11-05 12:59:04 [INFO]: Request method used: POST, URL used: /users/logi
-2024-11-05 12:59:04 [INFO]: Request method used: POST, URL used: /users/logi
-2024-11-05 12:59:12 [INFO]: Request method used: POST, URL used: /users/logi
-2024-11-05 12:59:12 [INFO]: Request method used: POST, URL used: /users/logi
-2024-11-05 13:01:29 [INFO]: Request method used: POST, URL used: /users/logi
-2024-11-05 13:01:29 [INFO]: POST /users/logi 404 150 - 8.581 ms
-2024-11-05 13:04:48 [INFO]: Request method used: POST, URL used: /users/logi
-2024-11-05 13:04:48 [INFO]: POST /users/logi 404 150 - 1.200 ms
-2024-11-05 13:37:15 [INFO]: Request method used: POST, URL used: /users/logi
-2024-11-05 13:38:19 [INFO]: Request method used: POST, URL used: /users/logi
-2024-11-05 13:40:08 [INFO]: Request method used: POST, URL used: /users/logi
-2024-11-05 13:43:25 [INFO]: Request method used: POST, URL used: /users/logi
-2024-11-05 13:43:25 [WARN]: Ruta no encontrada: /users/logi, Método: POST, IP: ::1
+2024-11-05 14:05:44 [INFO]: Request method used: POST, URL used: /users/logi
+2024-11-05 14:05:44 [WARN]: Rute not found: /users/logi, Method: POST, IP: ::1
+2024-11-05 14:09:56 [INFO]: Request method used: POST, URL used: /users/logi
+2024-11-05 14:09:56 [WARN]: Rute not found: /users/logi, Method: POST, IP: ::1
+2024-11-05 14:09:59 [WARN]: User not found during login attempt: gerarrrrrrr@example.co
+2024-11-05 14:10:27 [INFO]: All users retrieved successfully
+2024-11-05 14:10:41 [INFO]: Request method used: GET, URL used: /user
+2024-11-05 14:10:41 [WARN]: Rute not found: /user, Method: GET, IP: ::1
+2024-11-05 14:10:43 [INFO]: All users retrieved successfully

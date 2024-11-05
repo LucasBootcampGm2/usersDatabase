@@ -1,3 +1,4 @@
-2024-11-05 11:22:01 [WARN]: User not found during login attempt:  gerarrrrrrr@example.co
-
-2024-11-05 13:43:25 [WARN]: Ruta no encontrada: /users/logi, Método: POST, IP: ::1
+2024-11-05 14:05:44 [WARN]: Rute not found: /users/logi, Method: POST, IP: ::1
+2024-11-05 14:09:56 [WARN]: Rute not found: /users/logi, Method: POST, IP: ::1
+2024-11-05 14:09:59 [WARN]: User not found during login attempt: gerarrrrrrr@example.co
+2024-11-05 14:10:41 [WARN]: Rute not found: /user, Method: GET, IP: ::1
