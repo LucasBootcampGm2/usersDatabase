@@ -4,15 +4,26 @@ const validateUser = [
   body("name")
     .isString()
     .isLength({ min: 2 })
-    .withMessage("Name is required and should be at least 2 characters."),
-  body("email").isEmail().withMessage("Invalid email address."),
+    .withMessage("Name is required and should be at least 2 characters.")
+    .trim()
+    .escape(),
+
+  body("email")
+    .isEmail()
+    .withMessage("Invalid email address.")
+    .normalizeEmail(),
+
   body("password")
     .isLength({ min: 6 })
-    .withMessage("Password must be at least 6 characters."),
+    .withMessage("Password must be at least 6 characters.")
+    .trim(),
+
   body("role")
     .optional()
     .isIn(["admin", "user"])
-    .withMessage("Role must be either 'admin' or 'user'."),
+    .withMessage("Role must be either 'admin' or 'user'")
+    .trim()
+    .escape(),
 ];
 
 const validateParcialUpdate = [
@@ -20,8 +31,15 @@ const validateParcialUpdate = [
     .optional()
     .isString()
     .isLength({ min: 2 })
-    .withMessage("Name should be at least 2 characters."),
-  body("email").optional().isEmail().withMessage("Invalid email address."),
+    .withMessage("Name should be at least 2 characters.")
+    .trim()
+    .escape(),
+
+  body("email")
+    .optional()
+    .isEmail()
+    .withMessage("Invalid email address.")
+    .normalizeEmail(),
 ];
 
 const validatePasswordChange = [
@@ -31,7 +49,9 @@ const validatePasswordChange = [
     .isLength({ min: 6 })
     .withMessage("Old password must be at least 6 characters long")
     .notEmpty()
-    .withMessage("Old password cannot be empty"),
+    .withMessage("Old password cannot be empty")
+    .trim(),
+
   body("newPassword")
     .exists()
     .withMessage("New password is required")
@@ -39,6 +59,7 @@ const validatePasswordChange = [
     .withMessage("New password must be at least 6 characters long")
     .notEmpty()
     .withMessage("New password cannot be empty")
+    .trim()
     .custom((newPassword, { req }) => {
       const oldPassword = req.body.oldPassword;
       if (newPassword === oldPassword) {
@@ -49,8 +70,15 @@ const validatePasswordChange = [
 ];
 
 const validateLogin = [
-  body("email").isEmail().withMessage("Invalid email address."),
-  body("password").isLength({min: 2, max: 4}).withMessage("Password Length is not ok."),
+  body("email")
+    .isEmail()
+    .withMessage("Invalid email address.")
+    .normalizeEmail(),
+
+  body("password")
+    .isLength({ min: 6 })
+    .withMessage("Password Length is not ok.")
+    .trim(),
 ];
 
 export {
