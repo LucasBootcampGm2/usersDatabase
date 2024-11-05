@@ -1,11 +1,10 @@
-import express from "express";
+import express, { json } from "express";
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
 import {
   authenticate,
   authorize,
-  requestInfo,
 } from "../middlewares/middlewares.js";
 import db from "../database/sqlite.js";
 import {
@@ -15,11 +14,11 @@ import {
   validateUser,
 } from "../validation/expressValidation.js";
 import { serverHandleErrors } from "../errorHandlers/server.js";
-import { validationHandlerErrors } from "../errorHandlers/validation.js";
+import { validationErrorHandler } from "../errorHandlers/validation.js";
 import logger from "../logs/logger.js";
 
 const router = express.Router();
-router.use(serverHandleErrors, requestInfo);
+router.use(serverHandleErrors);
 
 dotenv.config();
 const secretKey = process.env.SECRET_KEY;
@@ -27,10 +26,10 @@ const secretKey = process.env.SECRET_KEY;
 router.get("/", authenticate, authorize("admin"), (req, res, next) => {
   db.all("SELECT * FROM users", [], (err, rows) => {
     if (err) {
-      logger.error("Error getting all users: ", err.message);
+      logger.error("Error retrieving all users: ", err.message);
       return next(err);
     }
-    logger.info("Users retrieved successfully");
+    logger.info("All users retrieved successfully");
     res.json({ rows });
   });
 });
@@ -38,7 +37,7 @@ router.get("/", authenticate, authorize("admin"), (req, res, next) => {
 router.get("/:id", authenticate, (req, res, next) => {
   const id = parseInt(req.params.id);
   if (id !== req.user.id) {
-    logger.warn("Access denied for user ID:", id);
+    logger.warn("Access denied for user ID: ", id);
     return res.status(403).json({ message: "Access denied" });
   }
   db.get("SELECT * FROM users WHERE id = ?", [id], (err, row) => {
@@ -47,12 +46,12 @@ router.get("/:id", authenticate, (req, res, next) => {
       logger.warn("User not found: ", id);
       return res.status(404).json({ message: "User not found" });
     }
-    logger.info("User retrieved successfully: ", row);
+    logger.info("User retrieved successfully: ", { id, user: row });
     res.status(200).json(row);
   });
 });
 
-router.post("/", validateUser, (req, res, next) => {
+router.post("/", validateUser, validationErrorHandler, (req, res, next) => {
   const { name, email, password, role } = req.body;
   const hashedPassword = bcrypt.hashSync(password, 10);
 
@@ -61,15 +60,12 @@ router.post("/", validateUser, (req, res, next) => {
     [name, email, hashedPassword, role || "user"],
     function (err) {
       if (err) {
-        logger.error("Error creating user: ", err.message);
+        logger.error(`Error creating user: ${err.message}`);
         return next(err);
       }
-      logger.info("User created successfully: ", {
-        id: this.lastID,
-        name,
-        email,
-      });
-      res.status(201).json({ id: this.lastID, name, email });
+      const userId = this.lastID;
+      logger.info(`User created successfully: ${userId}`);
+      res.status(201).json({ id: userId, name, email });
     }
   );
 });
@@ -78,11 +74,11 @@ router.patch(
   "/:id",
   authenticate,
   validateParcialUpdate,
-  validationHandlerErrors,
+  validationErrorHandler,
   async (req, res, next) => {
     const id = parseInt(req.params.id);
     if (id !== req.user.id) {
-      logger.warn("Access denied for user ID:", id);
+      logger.warn("Access denied for user ID: ", id);
       return res.status(403).json({ message: "Access denied" });
     }
 
@@ -125,7 +121,7 @@ router.put(
   "/:id",
   authenticate,
   validateUser,
-  validationHandlerErrors,
+  validationErrorHandler,
   async (req, res, next) => {
     const id = parseInt(req.params.id);
     if (id !== req.user.id) {
@@ -172,13 +168,13 @@ router.put(
   "/:id/change-password",
   authenticate,
   validatePasswordChange,
-  validationHandlerErrors,
+  validationErrorHandler,
   async (req, res, next) => {
     const id = parseInt(req.params.id);
     const { oldPassword, newPassword } = req.body;
 
     if (id !== req.user.id) {
-      logger.warn("Permission denied for user ID:", id);
+      logger.warn(`Permission denied for user ${id}`);
       return res.status(403).json({ message: "Permission denied" });
     }
 
@@ -190,21 +186,20 @@ router.put(
     });
 
     if (!row) {
-      logger.warn("User not found for password change: ", id);
-      return res.status(404).json({ message: "User not found." });
+      logger.warn(`User ${id} not found for password change`);
+      return res.status(404).json({ message: `User ${id} not found.` });
     }
 
     const isMatch = await bcrypt.compare(oldPassword, row.password);
     if (!isMatch) {
-      logger.warn("Invalid old password attempt for user ID:", id);
+      logger.warn(`Invalid old password attempt for user ${id}`);
       return res.status(401).json({ message: "Invalid old password" });
     }
 
     const isSamePassword = await bcrypt.compare(oldPassword, newPassword);
     if (isSamePassword) {
       logger.warn(
-        "New password cannot be the same as old password for user ID:",
-        id
+        `New password cannot be the same as old password for user ${id} `
       );
       return res.status(401).json({ message: "Invalid new password" });
     }
@@ -216,7 +211,7 @@ router.put(
       [hashedPassword, id],
       function (err) {
         if (err) return next(err);
-        logger.info("Password updated successfully for user ID:", id);
+        logger.info(`Password updated successfully for user ${id}`);
         res.status(200).json({ message: "Password updated successfully." });
       }
     );
@@ -226,7 +221,7 @@ router.put(
 router.delete("/:id", authenticate, (req, res, next) => {
   const id = parseInt(req.params.id);
   if (req.user.id !== id) {
-    logger.warn("User attempted to delete another user ID:", id);
+    logger.warn(`User ${req.user.id} attempted to delete user ${id}`);
     return res
       .status(403)
       .json({ message: "You do not have permission to delete this user" });
@@ -235,38 +230,54 @@ router.delete("/:id", authenticate, (req, res, next) => {
   db.run("DELETE FROM users WHERE id = ?", [id], function (err) {
     if (err) return next(err);
     if (this.changes > 0) {
-      logger.info("User deleted successfully:", id);
+      logger.info(`User ${id} deleted successfully:`);
       res.status(200).json({ message: `User ${id} deleted` });
     } else {
-      logger.warn("User not found for deletion: ", id);
+      logger.warn(`User ${id} not found for deletion`);
       res.status(404).json({ message: "User not found" });
     }
   });
 });
 
-router.post("/login", validateLogin, async (req, res, next) => {
-  const { email, password } = req.body;
+router.post(
+  "/login",
+  validateLogin,
+  validationErrorHandler,
+  async (req, res, next) => {
+    const { email, password } = req.body;
 
-  db.get("SELECT * FROM users WHERE email = ?", [email], (err, user) => {
-    if (err) {
-      logger.error("Error during login attempt: ", err.message);
-      return next(err);
-    }
-    if (!user) {
-      logger.warn("User not found during login attempt: ", email);
-      return res.status(404).json({ message: "User not found" });
-    }
+    db.get("SELECT * FROM users WHERE email = ?", [email], (err, user) => {
+      if (err) {
+        logger.error(
+          `Error during login attempt: ${JSON.stringify(err.message, null, 2)}`
+        );
+        return next(err);
+      }
+      if (!user) {
+        logger.warn(`User not found during login attempt:  ${email}`);
+        return res.status(404).json({ message: "User not found" });
+      }
 
-    const passwordMatch = bcrypt.compareSync(password, user.password);
-    if (!passwordMatch) {
-      logger.warn("Invalid credentials for user email:", email);
-      return res.status(401).json({ message: "Invalid credentials" });
-    }
+      const passwordMatch = bcrypt.compareSync(password, user.password);
+      if (!passwordMatch) {
+        logger.warn(`Invalid credentials for user email: ${email}`);
+        return res.status(401).json({ message: "Invalid credentials" });
+      }
 
-    const token = jwt.sign({ id: user.id, role: user.role }, secretKey);
-    logger.info("User logged in successfully: ", { id: user.id, email });
-    res.json({ id: user.id, token });
-  });
-});
+      const token = jwt.sign({ id: user.id, role: user.role }, secretKey);
+      logger.info(
+        `User logged in successfully: ${JSON.stringify(
+          {
+            id: user.id,
+            email,
+          },
+          null,
+          2
+        )}`
+      );
+      res.json({ id: user.id, token });
+    });
+  }
+);
 
 export default router;

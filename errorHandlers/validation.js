@@ -1,12 +1,13 @@
 import { validationResult } from "express-validator";
+import logger from "../logs/logger.js";
 
-const validationHandlerErrors = (req, res, next) => {
+const validationErrorHandler = (req, res, next) => {
   const errors = validationResult(req);
-  console.log({ errors });
   if (!errors.isEmpty()) {
+    logger.warn(`Validation errors: ${JSON.stringify(errors.array(), null, 2)}`);
     return res.status(400).json({ errors: errors.array() });
   }
   next();
 };
 
-export { validationHandlerErrors };
+export { validationErrorHandler };

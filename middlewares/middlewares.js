@@ -1,12 +1,13 @@
 import db from "../database/sqlite.js";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import logger from "../logs/logger.js";
 
 dotenv.config();
 const secretKey = process.env.SECRET_KEY;
 
-const requestInfo = (req, res, next) => {
-  console.log(`Request method used: ${req.method}, URL used: ${req.url}`);
+const loggerInfo = (req, res, next) => {
+  logger.info(`Request method used: ${req.method}, URL used: ${req.url}`);
   next();
 };
 
@@ -48,4 +49,4 @@ const validateUser = (req, res, next) => {
   });
 };
 
-export { requestInfo, authenticate, authorize, validateUser };
+export { loggerInfo, authenticate, authorize, validateUser };
