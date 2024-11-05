@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 dotenv.config();
 const secretKey = process.env.SECRET_KEY;
 
-const logger = (req, res, next) => {
+const requestInfo = (req, res, next) => {
   console.log(`Request method used: ${req.method}, URL used: ${req.url}`);
   next();
 };
@@ -48,4 +48,4 @@ const validateUser = (req, res, next) => {
   });
 };
 
-export { logger, authenticate, authorize, validateUser };
+export { requestInfo, authenticate, authorize, validateUser };

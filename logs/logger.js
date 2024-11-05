@@ -1,4 +1,8 @@
 import winston from "winston";
+import path from "path";
+
+const __dirname = path.dirname(new URL(import.meta.url).pathname);
+const filePath = path.join(__dirname, "users.log");
 
 const logger = winston.createLogger({
   level: "info",
@@ -10,7 +14,7 @@ const logger = winston.createLogger({
   ),
   transports: [
     new winston.transports.Console(),
-    new winston.transports.File({ filename: "/users.log" }),
+    new winston.transports.File({ filename: filePath }),
   ],
 });
 
