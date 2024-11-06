@@ -20,8 +20,7 @@ usersDatabase/
 |
 ├── node_modules
 |
-├── public/js
-| └── index.js
+├── app.js
 |
 ├── .env
 |
@@ -39,7 +38,7 @@ usersDatabase/
 
 **Estimated time**: Development time of 2 hours
 
-### 2. **index.js**
+### 2. **app.js**
 
 - **Functionality**: Entry point of the application, configures middleware, and sets up the server.
 - **Technologies Used**: Express, dotenv for environment variable management.
@@ -86,7 +85,7 @@ usersDatabase/
 4. **Run the Application**:  
    Start the server:
 
-   node index.js
+   node app.js
 
 5. **Access the API**:  
    The server will be running at `http://localhost:3000`.

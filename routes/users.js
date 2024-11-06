@@ -1,6 +1,5 @@
-import express, { json } from "express";
+import express from "express";
 import bcrypt from "bcrypt";
-import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
 
 import logger from "../logs/logger.js";
@@ -20,7 +19,6 @@ import { validationErrorHandler } from "../errorHandlers/validationErrorHandler.
 const router = express.Router();
 router.use(serverErrorHandler);
 
-dotenv.config();
 const secretKey = process.env.SECRET_KEY;
 
 router.get("/", authenticate, authorize("admin"), (req, res, next) => {

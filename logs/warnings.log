@@ -28,3 +28,11 @@
 2024-11-05 14:30:04 [WARN]: User not found for update: ID 10
 2024-11-05 23:58:31 [ERROR]: Error creating user: SQLITE_CONSTRAINT: UNIQUE constraint failed: users.email
 2024-11-05 23:58:31 [ERROR]:  Error: SQLITE_CONSTRAINT: UNIQUE constraint failed: users.email - Url: /users - Method: POST - IP: ::1
+2024-11-06 10:44:43 [ERROR]:  Error: Test error - Url: /test - Method: GET - IP: 127.0.0.1
+2024-11-06 10:44:43 [WARN]: Rute not found: /nonexistent, Method: GET, IP: 127.0.0.1
+2024-11-06 10:53:18 [ERROR]:  Error: Test error - Url: /test - Method: GET - IP: 127.0.0.1
+2024-11-06 10:53:18 [WARN]: Rute not found: /nonexistent, Method: GET, IP: 127.0.0.1
+2024-11-06 10:55:09 [ERROR]:  Error: Test error - Url: /test - Method: GET - IP: 127.0.0.1
+2024-11-06 10:55:09 [WARN]: Rute not found: /nonexistent, Method: GET, IP: 127.0.0.1
+2024-11-06 11:09:15 [ERROR]:  Error: Test error - Url: /test - Method: GET - IP: 127.0.0.1
+2024-11-06 11:09:15 [WARN]: Rute not found: /nonexistent, Method: GET, IP: 127.0.0.1

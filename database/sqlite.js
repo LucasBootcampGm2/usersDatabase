@@ -1,8 +1,6 @@
 import sqlite3 from "sqlite3";
-import dotenv from "dotenv";
 
-dotenv.config();
-const dbPath = process.env.DB_PATH;
+const dbPath = process.env.NODE_ENV === 'test' ? process.env.TEST_DB_PATH : process.env.DB_PATH;
 const users = JSON.parse(process.env.EXAMPLE_USERS);
 
 const db = new sqlite3.Database(dbPath, (err) => {
