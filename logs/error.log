@@ -1,0 +1,2 @@
+2024-11-05 23:58:31 [ERROR]: Error creating user: SQLITE_CONSTRAINT: UNIQUE constraint failed: users.email
+2024-11-05 23:58:31 [ERROR]:  Error: SQLITE_CONSTRAINT: UNIQUE constraint failed: users.email - Url: /users - Method: POST - IP: ::1

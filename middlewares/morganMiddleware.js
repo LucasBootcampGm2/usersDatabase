@@ -1,9 +1,9 @@
 import morgan from "morgan";
-import logger from "./logger.js";
+import logger from "../logs/logger.js";
 
 const morganMiddleWare = morgan("tiny", {
   stream: {
-    write: (message) => logger.info(message.trim()), 
+    write: (message) => logger.info(message.trim()),
   },
 });
 

@@ -1,9 +1,11 @@
 import express from "express";
-import userRouter from "../../routes/users.js";
+import userRouter from "../routes/users.js";
 import dotenv from "dotenv";
-import { loggerInfo } from "../../middlewares/middlewares.js";
-import { serverHandleErrors } from "../../errorHandlers/server.js";
-import { notFoundHandler } from "../../errorHandlers/notFound.js";
+import { loggerInfo } from "../middlewares/loggerMiddleware.js";
+import {
+  serverErrorHandler,
+  notFoundHandler,
+} from "../errorHandlers/serverErrorHandler.js";
 
 dotenv.config();
 const port = process.env.PORT;
@@ -14,7 +16,7 @@ app.use(express.json());
 
 app.use("/users", userRouter);
 
-app.use(serverHandleErrors);
+app.use(serverErrorHandler);
 
 app.use(loggerInfo);
 

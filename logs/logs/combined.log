@@ -1,9 +1,0 @@
-2024-11-05 14:05:44 [INFO]: Request method used: POST, URL used: /users/logi
-2024-11-05 14:05:44 [WARN]: Rute not found: /users/logi, Method: POST, IP: ::1
-2024-11-05 14:09:56 [INFO]: Request method used: POST, URL used: /users/logi
-2024-11-05 14:09:56 [WARN]: Rute not found: /users/logi, Method: POST, IP: ::1
-2024-11-05 14:09:59 [WARN]: User not found during login attempt: gerarrrrrrr@example.co
-2024-11-05 14:10:27 [INFO]: All users retrieved successfully
-2024-11-05 14:10:41 [INFO]: Request method used: GET, URL used: /user
-2024-11-05 14:10:41 [WARN]: Rute not found: /user, Method: GET, IP: ::1
-2024-11-05 14:10:43 [INFO]: All users retrieved successfully

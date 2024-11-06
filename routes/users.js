@@ -3,8 +3,7 @@ import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
 
-import { authenticate, authorize } from "../middlewares/middlewares.js";
-
+import logger from "../logs/logger.js";
 import db from "../database/sqlite.js";
 
 import {
@@ -14,12 +13,12 @@ import {
   validateUser,
 } from "../validation/expressValidation.js";
 
-import { serverHandleErrors } from "../errorHandlers/server.js";
-import { validationErrorHandler } from "../errorHandlers/validation.js";
-import logger from "../logs/logger.js";
+import { authorize, authenticate } from "../middlewares/authMiddlewares.js";
+import { serverErrorHandler } from "../errorHandlers/serverErrorHandler.js";
+import { validationErrorHandler } from "../errorHandlers/validationErrorHandler.js";
 
 const router = express.Router();
-router.use(serverHandleErrors);
+router.use(serverErrorHandler);
 
 dotenv.config();
 const secretKey = process.env.SECRET_KEY;

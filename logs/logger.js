@@ -17,7 +17,7 @@ const newTransport = (filePath, level) => {
       winston.format.printf(({ level, message, timestamp, stack }) => {
         return `${timestamp} [${level.toUpperCase()}]: ${stack || message}`;
       })
-    )
+    ),
   });
 };
 
@@ -25,7 +25,7 @@ const logger = winston.createLogger({
   levels: customLevels.levels,
   format: winston.format.combine(
     winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
-    winston.format.errors({ stack: true }),
+    winston.format.errors({ stack: true })
   ),
   transports: [
     new winston.transports.Console({
@@ -37,18 +37,18 @@ const logger = winston.createLogger({
         })
       ),
     }),
-    newTransport("logs/error.log", "error"),
-    newTransport("logs/warnings.log", "warn"),
-    newTransport("logs/combined.log", "info"),
+    newTransport("./error.log", "error"),
+    newTransport("./warnings.log", "warn"),
+    newTransport("./combined.log", "info"),
   ],
   exceptionHandlers: [
     new winston.transports.File({
-      filename: path.resolve(__dirname, "logs/exceptions.log"),
+      filename: path.resolve(__dirname, "./exceptions.log"),
     }),
   ],
   rejectionHandlers: [
     new winston.transports.File({
-      filename: path.resolve(__dirname, "logs/rejections.log"),
+      filename: path.resolve(__dirname, "./rejections.log"),
     }),
   ],
   exitOnError: false,
