@@ -38,7 +38,7 @@ const validateUser = [
     .escape(),
 ];
 
-const validateParcialUpdate = [
+const validateUpdate = [
   body("name")
     .optional()
     .isString()
@@ -111,7 +111,7 @@ const validateLogin = [
 
 export {
   validateUser,
-  validateParcialUpdate,
+  validateUpdate,
   validatePasswordChange,
   validateLogin,
 };

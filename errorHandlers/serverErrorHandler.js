@@ -21,9 +21,9 @@ const serverErrorHandler = (err, req, res, next) => {
 
 const notFoundHandler = (req, res, next) => {
   logger.warn(
-    `Rute not found: ${req.originalUrl}, Method: ${req.method}, IP: ${req.ip}`
+    `Route not found: ${req.originalUrl}, Method: ${req.method}, IP: ${req.ip}`
   );
-  res.status(404).json({ error: "Rute not found" });
+  res.status(404).json({ error: "Route not found" });
 };
 
 export { notFoundHandler, serverErrorHandler};

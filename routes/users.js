@@ -7,7 +7,7 @@ import db from "../database/sqlite.js";
 
 import {
   validateLogin,
-  validateParcialUpdate,
+  validateUpdate,
   validatePasswordChange,
   validateUser,
 } from "../validation/expressValidation.js";
@@ -15,6 +15,7 @@ import {
 import { authorize, authenticate } from "../middlewares/authMiddlewares.js";
 import { serverErrorHandler } from "../errorHandlers/serverErrorHandler.js";
 import { validationErrorHandler } from "../errorHandlers/validationErrorHandler.js";
+import { existUser } from "../middlewares/existUserMiddleware.js";
 
 const router = express.Router();
 router.use(serverErrorHandler);
@@ -49,9 +50,16 @@ router.get("/:id", authenticate, (req, res, next) => {
   });
 });
 
-router.post("/", validateUser, validationErrorHandler, (req, res, next) => {
+router.post("/", validateUser, validationErrorHandler, async (req, res, next) => {
   const { name, email, password, role } = req.body;
   const hashedPassword = bcrypt.hashSync(password, 10);
+
+  const existingUser = await existUser(email);
+
+  if (existingUser) {
+    logger.warn(`Email already in use: ${email}`);
+    return res.status(409).json({ message: "Email already in use" });
+  }
 
   db.run(
     "INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)",
@@ -71,7 +79,7 @@ router.post("/", validateUser, validationErrorHandler, (req, res, next) => {
 router.patch(
   "/:id",
   authenticate,
-  validateParcialUpdate,
+  validateUpdate,
   validationErrorHandler,
   async (req, res, next) => {
     const id = parseInt(req.params.id);
@@ -82,16 +90,7 @@ router.patch(
 
     const { name, email } = req.body;
 
-    const existingUser = await new Promise((resolve, reject) => {
-      db.get(
-        "SELECT * FROM users WHERE email = ? AND id != ?",
-        [email, id],
-        (err, row) => {
-          if (err) return reject(err);
-          resolve(row);
-        }
-      );
-    });
+    const existingUser = await existUser(email);
 
     if (existingUser) {
       logger.warn(`Email already in use: ${email}`);
@@ -118,7 +117,7 @@ router.patch(
 router.put(
   "/:id",
   authenticate,
-  validateUser,
+  validateUpdate,
   validationErrorHandler,
   async (req, res, next) => {
     const id = parseInt(req.params.id);
@@ -129,16 +128,7 @@ router.put(
 
     const { name, email } = req.body;
 
-    const existingUser = await new Promise((resolve, reject) => {
-      db.get(
-        "SELECT * FROM users WHERE email = ? AND id != ?",
-        [email, id],
-        (err, row) => {
-          if (err) return reject(err);
-          resolve(row);
-        }
-      );
-    });
+    const existingUser = await existUser(email);
 
     if (existingUser) {
       logger.warn(`Email already in use: ${email}`);
@@ -176,14 +166,9 @@ router.put(
       return res.status(403).json({ message: "Permission denied" });
     }
 
-    const row = await new Promise((resolve, reject) => {
-      db.get("SELECT * FROM users WHERE id = ?", [id], (err, row) => {
-        if (err) return reject(err);
-        resolve(row);
-      });
-    });
+    const existingUser = await existUser(email);
 
-    if (!row) {
+    if (!existingUser) {
       logger.warn(`User not found for password change: ID ${id}`);
       return res.status(404).json({ message: `User not found.` });
     }

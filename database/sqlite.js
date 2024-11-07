@@ -1,6 +1,7 @@
 import sqlite3 from "sqlite3";
 
-const dbPath = process.env.NODE_ENV === 'test' ? process.env.TEST_DB_PATH : process.env.DB_PATH;
+const dbPath =
+  process.env.NODE_ENV === "test" ? ":memory:" : process.env.DB_PATH;
 const users = JSON.parse(process.env.EXAMPLE_USERS);
 
 const db = new sqlite3.Database(dbPath, (err) => {
@@ -15,7 +16,7 @@ db.serialize(() => {
     CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
-      email TEXT NOT NULL UNIQUE,
+      email TEXT NOT NULL,
       password TEXT NOT NULL,
       role TEXT NOT NULL
     )

@@ -24,3 +24,15 @@
 2024-11-07 09:56:43 [ERROR]:  Error: SQLITE_CONSTRAINT: UNIQUE constraint failed: users.email - Url: /users - Method: POST - IP: ::ffff:127.0.0.1
 2024-11-07 09:56:59 [ERROR]: Error creating user: SQLITE_CONSTRAINT: UNIQUE constraint failed: users.email
 2024-11-07 09:56:59 [ERROR]:  Error: SQLITE_CONSTRAINT: UNIQUE constraint failed: users.email - Url: /users - Method: POST - IP: ::ffff:127.0.0.1
+2024-11-07 11:21:02 [ERROR]: Error creating user: SQLITE_CONSTRAINT: UNIQUE constraint failed: users.email
+2024-11-07 11:21:02 [ERROR]:  Error: SQLITE_CONSTRAINT: UNIQUE constraint failed: users.email - Url: /users - Method: POST - IP: ::ffff:127.0.0.1
+2024-11-07 11:21:45 [ERROR]: Error creating user: SQLITE_CONSTRAINT: UNIQUE constraint failed: users.email
+2024-11-07 11:21:45 [ERROR]:  Error: SQLITE_CONSTRAINT: UNIQUE constraint failed: users.email - Url: /users - Method: POST - IP: ::ffff:127.0.0.1
+2024-11-07 11:40:24 [ERROR]: Error creating user: SQLITE_CONSTRAINT: UNIQUE constraint failed: users.email
+2024-11-07 11:40:24 [ERROR]:  Error: SQLITE_CONSTRAINT: UNIQUE constraint failed: users.email - Url: /users - Method: POST - IP: ::ffff:127.0.0.1
+2024-11-07 11:41:27 [ERROR]: Error creating user: SQLITE_CONSTRAINT: UNIQUE constraint failed: users.email
+2024-11-07 11:41:27 [ERROR]:  Error: SQLITE_CONSTRAINT: UNIQUE constraint failed: users.email - Url: /users - Method: POST - IP: ::ffff:127.0.0.1
+2024-11-07 11:54:54 [ERROR]: Error creating user: SQLITE_CONSTRAINT: UNIQUE constraint failed: users.email
+2024-11-07 11:54:54 [ERROR]:  Error: SQLITE_CONSTRAINT: UNIQUE constraint failed: users.email - Url: /users - Method: POST - IP: ::ffff:127.0.0.1
+2024-11-07 13:09:56 [ERROR]: Error creating user: SQLITE_CONSTRAINT: UNIQUE constraint failed: users.email
+2024-11-07 13:09:56 [ERROR]:  Error: SQLITE_CONSTRAINT: UNIQUE constraint failed: users.email - Url: /users - Method: POST - IP: ::1
