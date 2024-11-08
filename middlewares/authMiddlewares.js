@@ -24,4 +24,14 @@ const authorize = (role) => (req, res, next) => {
   next();
 };
 
-export { authenticate, authorize };
+const authId = (req, res, next) => {
+  const id = parseInt(req.params.id);
+
+  if (id !== req.user.id) {
+    logger.warn(`Access denied for user ID: ${id}`);
+    return res.status(403).json({ message: "Access denied" });
+  }
+  next();
+};
+
+export { authenticate, authorize, authId };
