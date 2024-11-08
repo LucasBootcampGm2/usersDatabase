@@ -1,4 +1,5 @@
 import db from "../database/sqlite.js";
+import logger from "../logs/logger.js";
 
 const existUser = async (email) => {
   return new Promise((resolve, reject) => {
@@ -9,4 +10,14 @@ const existUser = async (email) => {
   });
 };
 
-export { existUser };
+const checkEmailExistence = async (email, res) => {
+  const existingUser = await existUser(email);
+  if (existingUser) {
+    logger.warn(`Email already in use: ${email}`);
+    res.status(409).json({ message: "Email already in use" });
+    return true;
+  }
+  return false;
+};
+
+export { checkEmailExistence };

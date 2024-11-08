@@ -48,7 +48,6 @@ describe("POST /users", () => {
     const response = await request(app).post("/users").send(user).expect(201);
 
     user = { id: response.body.id, ...user };
-    console.log("USUARRR", user);
 
     expect(response.body.name).toBe(user.name);
     expect(response.body.email).toBe(user.email);
@@ -73,6 +72,43 @@ describe("POST /users/login", () => {
 
     expect(decodedToken.role).toBe(user.role);
     expect(decodedToken.id).toBe(user.id);
+  });
+});
+
+describe("GET /users/:id", () => {
+  it("should get a specific user", async () => {
+    const response = await request(app)
+      .get(`/users/${user.id}`)
+      .set("Authorization", `Bearer ${userToken}`)
+      .expect(200);
+
+    expect(response.body.id).toBe(user.id);
+    expect(response.body.name).toBe(user.name);
+    expect(response.body.email).toBe(user.email);
+  });
+
+  it("should return 403 if accessing another user's data", async () => {
+    const newUser = {
+      name: "New User",
+      email: "newuser@prueba.com",
+      password: "1212aA",
+      role: "user",
+    };
+
+    await request(app).post("/users").send(newUser).expect(201);
+
+    const newUserToken = await request(app)
+      .post("/users/login")
+      .send({
+        email: newUser.email,
+        password: newUser.password,
+      })
+      .expect(200);
+
+    await request(app)
+      .get(`/users/${user.id}`)
+      .set("Authorization", `Bearer ${newUserToken.body.token}`)
+      .expect(403);
   });
 });
 
@@ -109,13 +145,46 @@ describe("PUT /users/:id", () => {
 
 describe("GET /users", () => {
   it("should get all users", async () => {
-    console.log("get", userToken);
-
     const response = await request(app)
       .get("/users")
       .set("Authorization", `Bearer ${userToken}`)
       .expect(200);
 
     console.log(response.body);
+  });
+});
+
+describe("DELETE /users/:id", () => {
+  it("should delete a user", async () => {
+    const response = await request(app)
+      .delete(`/users/${user.id}`)
+      .set("Authorization", `Bearer ${userToken}`)
+      .expect(200);
+
+    expect(response.body.message).toBe("User deleted");
+  });
+
+  it("should return 403 if trying to delete another user", async () => {
+    const newUser = {
+      name: "Another User",
+      email: "anotheruser@prueba.com",
+      password: "1212aA",
+      role: "user",
+    };
+
+    await request(app).post("/users").send(newUser).expect(201);
+
+    const newUserToken = await request(app)
+      .post("/users/login")
+      .send({
+        email: newUser.email,
+        password: newUser.password,
+      })
+      .expect(200);
+
+    await request(app)
+      .delete(`/users/${user.id}`)
+      .set("Authorization", `Bearer ${newUserToken.body.token}`)
+      .expect(403);
   });
 });

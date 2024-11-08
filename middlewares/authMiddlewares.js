@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import logger from "../logs/logger.js";
 const secretKey = process.env.SECRET_KEY;
 
 const authenticate = (req, res, next) => {
@@ -13,15 +14,25 @@ const authenticate = (req, res, next) => {
 
     next();
   } catch (error) {
+    logger.warn(`Invalid Token`);
     return res.status(403).json({ message: "Invalid Token" });
   }
 };
 
 const authorize = (role) => (req, res, next) => {
-  if (req.user.role !== role)
+  if (req.user.role !== role) {
+    logger.warn(`Access denied for user ID: ${id}`);
     return res.status(403).json({ message: "Access denied" });
-
+  }
   next();
 };
 
-export { authenticate, authorize };
+const authId = (req, res, next) => {
+  if (id !== req.user.id) {
+    logger.warn(`Access denied for user ID: ${id}`);
+    return res.status(403).json({ message: "Access denied" });
+  }
+  next();
+};
+
+export { authenticate, authorize, authId };

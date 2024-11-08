@@ -3382,3 +3382,121 @@
 2024-11-07 20:58:54 [INFO]: User updated successfully: ID 5
 2024-11-07 20:58:54 [WARN]: Email already in use: lucas.berardi@gm2dev.com
 2024-11-07 20:58:54 [INFO]: All users retrieved successfully
+2024-11-07 21:06:25 [WARN]: Validation errors: [
+  {
+    "type": "field",
+    "value": "1212a",
+    "msg": "Password must be at least 6 characters.",
+    "path": "password",
+    "location": "body"
+  },
+  {
+    "type": "field",
+    "value": "1212a",
+    "msg": "Password must include uppercase, lowercase letters, and a number.",
+    "path": "password",
+    "location": "body"
+  }
+]
+2024-11-07 21:06:25 [INFO]: User created successfully: ID 5
+2024-11-07 21:06:25 [INFO]: User logged in successfully: ID 5, email: usuario@prueba.com
+2024-11-07 21:06:25 [INFO]: User updated successfully: ID 5
+2024-11-07 21:06:25 [WARN]: Email already in use: lucas.berardi@gm2dev.com
+2024-11-07 21:06:25 [INFO]: All users retrieved successfully
+2024-11-07 21:06:25 [INFO]: User retrieved successfully: ID 5
+2024-11-07 21:06:25 [INFO]: User created successfully: ID 6
+2024-11-07 21:06:25 [INFO]: User logged in successfully: ID 6, email: newuser@prueba.com
+2024-11-07 21:06:25 [WARN]: Access denied for user ID: 5
+2024-11-07 21:06:25 [INFO]: User deleted successfully: ID 5
+2024-11-07 21:06:25 [INFO]: User created successfully: ID 7
+2024-11-07 21:06:25 [INFO]: User logged in successfully: ID 7, email: anotheruser@prueba.com
+2024-11-07 21:06:25 [WARN]: User 7 attempted to delete user 5
+2024-11-07 21:11:36 [WARN]: Validation errors: [
+  {
+    "type": "field",
+    "value": "1212a",
+    "msg": "Password must be at least 6 characters.",
+    "path": "password",
+    "location": "body"
+  },
+  {
+    "type": "field",
+    "value": "1212a",
+    "msg": "Password must include uppercase, lowercase letters, and a number.",
+    "path": "password",
+    "location": "body"
+  }
+]
+2024-11-07 21:11:36 [INFO]: User created successfully: ID 5
+2024-11-07 21:11:36 [INFO]: User logged in successfully: ID 5, email: usuario_1731024696340@prueba.com
+2024-11-07 21:11:36 [INFO]: User updated successfully: ID 5
+2024-11-07 21:11:36 [WARN]: Email already in use: lucascirlloberardi@gm2dev.com
+2024-11-07 21:11:36 [INFO]: All users retrieved successfully
+2024-11-07 21:11:36 [INFO]: User retrieved successfully: ID 5
+2024-11-07 21:11:36 [INFO]: User created successfully: ID 6
+2024-11-07 21:11:36 [INFO]: User logged in successfully: ID 6, email: newuser_1731024696528@prueba.com
+2024-11-07 21:11:36 [WARN]: Access denied for user ID: 5
+2024-11-07 21:11:36 [INFO]: User deleted successfully: ID 5
+2024-11-07 21:11:36 [INFO]: User created successfully: ID 7
+2024-11-07 21:11:36 [INFO]: User logged in successfully: ID 7, email: anotheruser_1731024696644@prueba.com
+2024-11-07 21:11:36 [WARN]: User 7 attempted to delete user 5
+2024-11-07 21:14:22 [WARN]: Validation errors: [
+  {
+    "type": "field",
+    "value": "1212a",
+    "msg": "Password must be at least 6 characters.",
+    "path": "password",
+    "location": "body"
+  },
+  {
+    "type": "field",
+    "value": "1212a",
+    "msg": "Password must include uppercase, lowercase letters, and a number.",
+    "path": "password",
+    "location": "body"
+  }
+]
+2024-11-07 21:14:23 [INFO]: User created successfully: ID 5
+2024-11-07 21:14:23 [INFO]: User logged in successfully: ID 5, email: usuario@prueba.com
+2024-11-07 21:14:23 [INFO]: User retrieved successfully: ID 5
+2024-11-07 21:14:23 [INFO]: User created successfully: ID 6
+2024-11-07 21:14:23 [INFO]: User logged in successfully: ID 6, email: newuser@prueba.com
+2024-11-07 21:14:23 [WARN]: Access denied for user ID: 5
+2024-11-07 21:14:23 [INFO]: User updated successfully: ID 5
+2024-11-07 21:14:23 [WARN]: Email already in use: lucas.berardi@gm2dev.com
+2024-11-07 21:14:23 [INFO]: All users retrieved successfully
+2024-11-07 21:14:23 [INFO]: User deleted successfully: ID 5
+2024-11-07 21:14:23 [INFO]: User created successfully: ID 7
+2024-11-07 21:14:23 [INFO]: User logged in successfully: ID 7, email: anotheruser@prueba.com
+2024-11-07 21:14:23 [WARN]: User 7 attempted to delete user 5
+2024-11-07 21:27:58 [WARN]: User not found during login attempt: aaaaass@example.com
+2024-11-07 21:28:14 [INFO]: User created successfully: ID 37
+2024-11-07 21:28:16 [WARN]: Email already in use: aaaaass@example.com
+2024-11-07 21:28:33 [INFO]: User logged in successfully: ID 37, email: aaaaass@example.com
+2024-11-07 21:28:39 [INFO]: User logged in successfully: ID 37, email: aaaaass@example.com
+2024-11-07 21:28:57 [INFO]: All users retrieved successfully
+2024-11-07 21:29:22 [INFO]: User created successfully: ID 38
+2024-11-07 21:29:36 [INFO]: User logged in successfully: ID 38, email: ass@example.com
+2024-11-07 21:41:13 [ERROR]: ReferenceError: logger is not defined
+    at checkEmailExistence (file:///home/lucas/Documents/usersDatabase/middlewares/existUserMiddleware.js:15:5)
+    at async file:///home/lucas/Documents/usersDatabase/routes/users.js:68:9
+2024-11-07 21:44:38 [WARN]: Email already in use: ass@example.com
+2024-11-07 21:44:50 [ERROR]: Error during login attempt
+2024-11-07 21:44:50 [ERROR]:  Error: data and hash arguments required - Url: /users/login - Method: POST - IP: ::1
+2024-11-07 21:47:00 [ERROR]: Error during login attempt
+2024-11-07 21:47:00 [ERROR]:  Error: data and hash arguments required - Url: /users/login - Method: POST - IP: ::1
+2024-11-07 21:47:31 [ERROR]: Error during login attempt
+2024-11-07 21:47:31 [ERROR]:  Error: undefined - Url: /users/login - Method: POST - IP: ::1
+2024-11-07 21:48:16 [ERROR]: Error during login attempt
+2024-11-07 21:48:16 [ERROR]:  Error: data and hash arguments required - Url: /users/login - Method: POST - IP: ::1
+2024-11-07 21:48:28 [INFO]: User logged in successfully: ID 38, email: ass@example.com
+2024-11-07 21:52:35 [ERROR]: Error during login attempt
+2024-11-07 21:52:35 [ERROR]:  Error: data and hash arguments required - Url: /users/login - Method: POST - IP: ::1
+2024-11-07 21:53:44 [ERROR]: Error during login attempt
+2024-11-07 21:53:44 [ERROR]:  Error: data and hash arguments required - Url: /users/login - Method: POST - IP: ::1
+2024-11-07 21:55:07 [ERROR]: Error during login attempt
+2024-11-07 21:55:07 [ERROR]:  Error: data and hash arguments required - Url: /users/login - Method: POST - IP: ::1
+2024-11-07 21:55:22 [ERROR]: Error during login attempt
+2024-11-07 21:55:22 [ERROR]:  Error: data and hash arguments required - Url: /users/login - Method: POST - IP: ::1
+2024-11-07 21:55:55 [INFO]: User logged in successfully: ID 38, email: ass@example.com
+2024-11-07 21:56:08 [INFO]: User logged in successfully: ID 38, email: ass@example.com

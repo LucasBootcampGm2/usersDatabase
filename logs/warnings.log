@@ -3065,3 +3065,82 @@
   }
 ]
 2024-11-07 20:58:54 [WARN]: Email already in use: lucas.berardi@gm2dev.com
+2024-11-07 21:06:25 [WARN]: Validation errors: [
+  {
+    "type": "field",
+    "value": "1212a",
+    "msg": "Password must be at least 6 characters.",
+    "path": "password",
+    "location": "body"
+  },
+  {
+    "type": "field",
+    "value": "1212a",
+    "msg": "Password must include uppercase, lowercase letters, and a number.",
+    "path": "password",
+    "location": "body"
+  }
+]
+2024-11-07 21:06:25 [WARN]: Email already in use: lucas.berardi@gm2dev.com
+2024-11-07 21:06:25 [WARN]: Access denied for user ID: 5
+2024-11-07 21:06:25 [WARN]: User 7 attempted to delete user 5
+2024-11-07 21:11:36 [WARN]: Validation errors: [
+  {
+    "type": "field",
+    "value": "1212a",
+    "msg": "Password must be at least 6 characters.",
+    "path": "password",
+    "location": "body"
+  },
+  {
+    "type": "field",
+    "value": "1212a",
+    "msg": "Password must include uppercase, lowercase letters, and a number.",
+    "path": "password",
+    "location": "body"
+  }
+]
+2024-11-07 21:11:36 [WARN]: Email already in use: lucascirlloberardi@gm2dev.com
+2024-11-07 21:11:36 [WARN]: Access denied for user ID: 5
+2024-11-07 21:11:36 [WARN]: User 7 attempted to delete user 5
+2024-11-07 21:14:22 [WARN]: Validation errors: [
+  {
+    "type": "field",
+    "value": "1212a",
+    "msg": "Password must be at least 6 characters.",
+    "path": "password",
+    "location": "body"
+  },
+  {
+    "type": "field",
+    "value": "1212a",
+    "msg": "Password must include uppercase, lowercase letters, and a number.",
+    "path": "password",
+    "location": "body"
+  }
+]
+2024-11-07 21:14:23 [WARN]: Access denied for user ID: 5
+2024-11-07 21:14:23 [WARN]: Email already in use: lucas.berardi@gm2dev.com
+2024-11-07 21:14:23 [WARN]: User 7 attempted to delete user 5
+2024-11-07 21:27:58 [WARN]: User not found during login attempt: aaaaass@example.com
+2024-11-07 21:28:16 [WARN]: Email already in use: aaaaass@example.com
+2024-11-07 21:41:13 [ERROR]: ReferenceError: logger is not defined
+    at checkEmailExistence (file:///home/lucas/Documents/usersDatabase/middlewares/existUserMiddleware.js:15:5)
+    at async file:///home/lucas/Documents/usersDatabase/routes/users.js:68:9
+2024-11-07 21:44:38 [WARN]: Email already in use: ass@example.com
+2024-11-07 21:44:50 [ERROR]: Error during login attempt
+2024-11-07 21:44:50 [ERROR]:  Error: data and hash arguments required - Url: /users/login - Method: POST - IP: ::1
+2024-11-07 21:47:00 [ERROR]: Error during login attempt
+2024-11-07 21:47:00 [ERROR]:  Error: data and hash arguments required - Url: /users/login - Method: POST - IP: ::1
+2024-11-07 21:47:31 [ERROR]: Error during login attempt
+2024-11-07 21:47:31 [ERROR]:  Error: undefined - Url: /users/login - Method: POST - IP: ::1
+2024-11-07 21:48:16 [ERROR]: Error during login attempt
+2024-11-07 21:48:16 [ERROR]:  Error: data and hash arguments required - Url: /users/login - Method: POST - IP: ::1
+2024-11-07 21:52:35 [ERROR]: Error during login attempt
+2024-11-07 21:52:35 [ERROR]:  Error: data and hash arguments required - Url: /users/login - Method: POST - IP: ::1
+2024-11-07 21:53:44 [ERROR]: Error during login attempt
+2024-11-07 21:53:44 [ERROR]:  Error: data and hash arguments required - Url: /users/login - Method: POST - IP: ::1
+2024-11-07 21:55:07 [ERROR]: Error during login attempt
+2024-11-07 21:55:07 [ERROR]:  Error: data and hash arguments required - Url: /users/login - Method: POST - IP: ::1
+2024-11-07 21:55:22 [ERROR]: Error during login attempt
+2024-11-07 21:55:22 [ERROR]:  Error: data and hash arguments required - Url: /users/login - Method: POST - IP: ::1

@@ -36,3 +36,22 @@
 2024-11-07 11:54:54 [ERROR]:  Error: SQLITE_CONSTRAINT: UNIQUE constraint failed: users.email - Url: /users - Method: POST - IP: ::ffff:127.0.0.1
 2024-11-07 13:09:56 [ERROR]: Error creating user: SQLITE_CONSTRAINT: UNIQUE constraint failed: users.email
 2024-11-07 13:09:56 [ERROR]:  Error: SQLITE_CONSTRAINT: UNIQUE constraint failed: users.email - Url: /users - Method: POST - IP: ::1
+2024-11-07 21:41:13 [ERROR]: ReferenceError: logger is not defined
+    at checkEmailExistence (file:///home/lucas/Documents/usersDatabase/middlewares/existUserMiddleware.js:15:5)
+    at async file:///home/lucas/Documents/usersDatabase/routes/users.js:68:9
+2024-11-07 21:44:50 [ERROR]: Error during login attempt
+2024-11-07 21:44:50 [ERROR]:  Error: data and hash arguments required - Url: /users/login - Method: POST - IP: ::1
+2024-11-07 21:47:00 [ERROR]: Error during login attempt
+2024-11-07 21:47:00 [ERROR]:  Error: data and hash arguments required - Url: /users/login - Method: POST - IP: ::1
+2024-11-07 21:47:31 [ERROR]: Error during login attempt
+2024-11-07 21:47:31 [ERROR]:  Error: undefined - Url: /users/login - Method: POST - IP: ::1
+2024-11-07 21:48:16 [ERROR]: Error during login attempt
+2024-11-07 21:48:16 [ERROR]:  Error: data and hash arguments required - Url: /users/login - Method: POST - IP: ::1
+2024-11-07 21:52:35 [ERROR]: Error during login attempt
+2024-11-07 21:52:35 [ERROR]:  Error: data and hash arguments required - Url: /users/login - Method: POST - IP: ::1
+2024-11-07 21:53:44 [ERROR]: Error during login attempt
+2024-11-07 21:53:44 [ERROR]:  Error: data and hash arguments required - Url: /users/login - Method: POST - IP: ::1
+2024-11-07 21:55:07 [ERROR]: Error during login attempt
+2024-11-07 21:55:07 [ERROR]:  Error: data and hash arguments required - Url: /users/login - Method: POST - IP: ::1
+2024-11-07 21:55:22 [ERROR]: Error during login attempt
+2024-11-07 21:55:22 [ERROR]:  Error: data and hash arguments required - Url: /users/login - Method: POST - IP: ::1
